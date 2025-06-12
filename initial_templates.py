@@ -1,4 +1,4 @@
-initial_stats = {
+initial_stats_block = {
     'games_played_career': 0,
     'games_played_season': 0,
     'minutes': {
@@ -85,4 +85,21 @@ initial_stats = {
         'career_average': 0,
         'season_average': 0
     },
+}
+
+initial_amateur_stats = {
+    'minutes': 0,
+    'points': 0,
+    'fg%': 0,
+    '3pt%': 0,
+    'ft%': 0,
+    'rebounds': 0,
+    'offensive_rebounds': 0,
+    'defensive_rebounds': 0,
+    'assists': 0,
+    'steals': 0,
+    'blocks': 0,
+    'turnovers': 0,
+    'fouls': 0,
+    '+/-': 0
 }
