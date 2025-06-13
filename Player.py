@@ -5,11 +5,10 @@ from rating_weights import *
 class Player:
 
     def __init__(self,
-                 name, height, weight, position, region, mercuriality, salary, age,
+                 name, height, weight, position, region, salary, age, mercuriality, contentment, character,
                  o_reb, finishing, open_mid, open_3, contest_mid, contest_3, playmaking, ft_shoot,
                  d_reb, block, steal, stickiness,
-                 awareness, endurance, confidence,
-                 contentment, character):
+                 awareness, endurance, confidence):
 
         # Static Values
         self.name = name
@@ -17,9 +16,13 @@ class Player:
         self.weight = weight
         self.position = position
         self.region = region
-        self.mercuriality = mercuriality
         self.salary = salary
         self.age = age
+
+        # Intangibles Ratings Off-Court
+        self.mercuriality = mercuriality
+        self.contentment = contentment
+        self.character = character
 
         # Ratings Class Values
         # Offensive Ratings
@@ -40,9 +43,6 @@ class Player:
         self.awareness = awareness
         self.endurance = endurance
         self.confidence = confidence
-        # Intangibles Ratings Off-Court
-        self.contentment = contentment
-        self.character = character
 
         # Calculations within class for Overall ratings
         self.o_ovr = self._calculate_o_overall()
@@ -61,21 +61,21 @@ class Player:
 
     # Private Methods
     def _calculate_o_overall(self):
-        if self._position == 'PG':
+        if self.position == 'PG':
             weight = pg_weight_offense
-        elif self._position == 'SG':
+        elif self.position == 'SG':
             weight = sg_weight_offense
-        elif self._position == 'SF':
+        elif self.position == 'SF':
             weight = sf_weight_offense
-        elif self._position == 'PF':
+        elif self.position == 'PF':
             weight = pf_weight_offense
         else:
             weight = c_weight_offense
 
-        return round((self.o_reb * weight['o_reb']) + (self.finishing * weight['finishing']) + \
-            (self.open_mid * weight['open_mid']) + (self.open_3 * weight['open_3']) + \
-            (self.contest_mid * weight['contest_mid']) + (self.contest_3 * weight['contest_3']) + \
-            (self.playmaking * weight['playmaking']) + (self.ft_shoot * weight['ft_shoot']))
+        return round((self.o_reb.curr_rating * weight['o_reb']) + (self.finishing.curr_rating * weight['finishing']) + \
+            (self.open_mid.curr_rating * weight['open_mid']) + (self.open_3.curr_rating * weight['open_3']) + \
+            (self.contest_mid.curr_rating * weight['contest_mid']) + (self.contest_3.curr_rating * weight['contest_3']) + \
+            (self.playmaking.curr_rating * weight['playmaking']) + (self.ft_shoot.curr_rating * weight['ft_shoot']))
 
     def _calculate_d_overall(self):
         if self.position == 'PG' or self.position == 'SG':
@@ -85,15 +85,15 @@ class Player:
         else:
             weight = c_weight_defense
 
-        return round((self.d_reb * weight['d_reb']) + (self.block * weight['block']) + \
-            (self.steal * weight['steal']) + (self.stickiness * weight['stickiness']))
+        return round((self.d_reb.curr_rating * weight['d_reb']) + (self.block.curr_rating * weight['block']) + \
+            (self.steal.curr_rating * weight['steal']) + (self.stickiness.curr_rating * weight['stickiness']))
 
     def _calculate_intangibles_overall(self):
-        return round((self.awareness * intangibles_weight['awareness']) + \
-            (self.endurance * intangibles_weight['endurance']) + (self.confidence * intangibles_weight['confidence']))
+        return round((self.awareness.curr_rating * intangibles_weight['awareness']) + \
+            (self.endurance.curr_rating * intangibles_weight['endurance']) + (self.confidence.curr_rating * intangibles_weight['confidence']))
 
     def _calculate_overall(self):
-        return round((self.o_ovr * .45) + (self.d_ovr * .45) + (self.intangibles_ovr * .1))
+        return round((self.o_ovr * .5) + (self.d_ovr * .4) + (self.intangibles_ovr * .1))
 
     def _calculate_amateur_stats(self):
         amateur_stats = initial_amateur_stats
@@ -109,3 +109,33 @@ class Player:
     def increment_age(self):
         self.age += 1
 
+    def change_mercuriality(self, new_merc):
+        self.mercuriality = new_merc
+
+    def change_contentment(self, new_content):
+        self.contentment = new_content
+
+    def change_character(self, new_character):
+        self.character = new_character
+
+
+p1 = Player('Sean Miller', 73, 190, 'C', 'Midwest USA',
+            15, 30, 'Low', 'High', 'High',
+            Rating('o_reb', 49, 0, 99),
+            Rating('finishing', 49, 0, 99),
+            Rating('open_mid', 49, 0, 99),
+            Rating('open_3', 49, 0, 99),
+            Rating('contest_mid', 49, 0, 99),
+            Rating('contest_3', 49, 0, 99),
+            Rating('playmaking', 49, 0, 99),
+            Rating('ft_shoot', 49, 0, 99),
+            Rating('d_reb', 99, 0, 99),
+            Rating('block', 99, 0, 99),
+            Rating('steal', 99, 0, 99),
+            Rating('stickiness', 99, 0, 99),
+            Rating('awareness', 29, 0, 99),
+            Rating('endurance', 29, 0, 99),
+            Rating('confidence', 29, 0, 99)
+            )
+
+print(p1.overall, p1.o_ovr, p1.d_ovr, p1.intangibles_ovr)

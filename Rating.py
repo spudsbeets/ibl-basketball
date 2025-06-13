@@ -1,6 +1,6 @@
 class Rating:
-    def __init__(self, stat_name, curr_rating, floor, ceiling):
-        self.stat_name = stat_name
+    def __init__(self, rating_name, curr_rating, floor, ceiling):
+        self.rating_name = rating_name
         self.curr_rating = curr_rating
         self.floor = floor
         self.ceiling = ceiling
