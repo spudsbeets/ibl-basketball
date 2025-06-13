@@ -20,7 +20,6 @@ sg_weight_offense = {
     'ft_shoot': .1
 }
 
-# START WORKIN HERE BISH
 sf_weight_offense = {
     'o_reb': .1,
     'finishing': .18,
@@ -30,6 +29,55 @@ sf_weight_offense = {
     'contest_3': .12,
     'playmaking': .1,
     'ft_shoot': .1
+}
+
+pf_weight_offense = {
+    'o_reb': .15,
+    'finishing': .21,
+    'open_mid': .13,
+    'open_3': .1,
+    'contest_mid': .13,
+    'contest_3': .1,
+    'playmaking': .08,
+    'ft_shoot': .1
+}
+
+c_weight_offense = {
+    'o_reb': .2,
+    'finishing': .25,
+    'open_mid': .11,
+    'open_3': .09,
+    'contest_mid': .11,
+    'contest_3': .09,
+    'playmaking': .05,
+    'ft_shoot': .1
+}
+
+g_weight_defense = {
+    'd_reb': .15,
+    'block': .15,
+    'steal': .3,
+    'stickiness': .4
+}
+
+f_weight_defense = {
+    'd_reb': .25,
+    'block': .25,
+    'steal': .2,
+    'stickiness': .3
+}
+
+c_weight_defense = {
+    'd_reb': .35,
+    'block': .35,
+    'steal': .15,
+    'stickiness': .15
+}
+
+intangibles_weight = {
+    'awareness': .34,
+    'endurance': .33,
+    'confidence': .33,
 }
 
 # testing
@@ -43,4 +91,4 @@ def does_equal_1(obj):
         return count
 
 
-print(does_equal_1(sf_weight_offense))
+print(does_equal_1(c_weight_defense))
