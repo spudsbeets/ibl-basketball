@@ -100,9 +100,6 @@ class Player:
         return amateur_stats
 
     # Public Methods
-    def set_rating(self, new_num, kind):
-        self.rating.kind = new_num
-
     def set_salary(self, new_num):
         self.salary = new_num
 
@@ -117,25 +114,3 @@ class Player:
 
     def change_character(self, new_character):
         self.character = new_character
-
-
-p1 = Player('Sean Miller', 73, 190, 'C', 'Midwest USA',
-            15, 30, 'Low', 'High', 'High',
-            Rating('o_reb', 49, 0, 99),
-            Rating('finishing', 49, 0, 99),
-            Rating('open_mid', 49, 0, 99),
-            Rating('open_3', 49, 0, 99),
-            Rating('contest_mid', 49, 0, 99),
-            Rating('contest_3', 49, 0, 99),
-            Rating('playmaking', 49, 0, 99),
-            Rating('ft_shoot', 49, 0, 99),
-            Rating('d_reb', 99, 0, 99),
-            Rating('block', 99, 0, 99),
-            Rating('steal', 99, 0, 99),
-            Rating('stickiness', 99, 0, 99),
-            Rating('awareness', 29, 0, 99),
-            Rating('endurance', 29, 0, 99),
-            Rating('confidence', 29, 0, 99)
-            )
-
-print(p1.overall, p1.o_ovr, p1.d_ovr, p1.intangibles_ovr)
