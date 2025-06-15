@@ -89,6 +89,3 @@ def does_equal_1(obj):
         return True
     else:
         return count
-
-
-print(does_equal_1(c_weight_defense))
