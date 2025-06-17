@@ -8,7 +8,8 @@ class Player:
                  name, height, weight, position, region, salary, age, mercuriality, contentment, character,
                  o_reb, finishing, open_mid, open_3, contest_mid, contest_3, playmaking, ft_shoot,
                  d_reb, block, steal, stickiness,
-                 awareness, endurance, confidence):
+                 awareness, endurance, confidence,
+                 speed, strength):
 
         # Static Values
         self.name = name
@@ -43,6 +44,9 @@ class Player:
         self.awareness = awareness
         self.endurance = endurance
         self.confidence = confidence
+        # Raw athleticism ratings
+        self.speed = speed
+        self.strength = strength
 
         # Calculations within class for Overall ratings
         self.o_ovr = self._calculate_o_overall()

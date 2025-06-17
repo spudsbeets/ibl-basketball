@@ -61,6 +61,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 20,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 85
             }
         },
         # Weight > 195, Height <= 76
@@ -124,6 +132,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 15,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 90
             }
         },
         # Weight <= 195, Height > 76
@@ -187,6 +203,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 15,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 90
             }
         },
         # Weight > 195, Height > 76
@@ -250,6 +274,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 10,
+                'high': 99
+            },
+            'strength': {
+                'low': 5,
+                'high': 95
             }
         }
     },
@@ -315,6 +347,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 20,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 85
             }
         },
         # Weight > 195, Height <= 76
@@ -378,6 +418,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 15,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 90
             }
         },
         # Weight <= 195, Height > 76
@@ -441,6 +489,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 15,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 90
             }
         },
         # Weight > 195, Height > 76
@@ -504,6 +560,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 10,
+                'high': 99
+            },
+            'strength': {
+                'low': 5,
+                'high': 95
             }
         }
     },
@@ -569,6 +633,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 15,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 90
             }
         },
         # Weight > 230, Height <= 79
@@ -632,6 +704,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 15,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 90
             }
         },
         # Weight <= 230, Height > 79
@@ -695,6 +775,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 10,
+                'high': 95
+            },
+            'strength': {
+                'low': 10,
+                'high': 90
             }
         },
         # Weight > 230, Height > 79
@@ -757,6 +845,14 @@ entry_draft_rating_spans = {
             },
             'confidence': {
                 'low': 1,
+                'high': 99
+            },
+            'speed': {
+                'low': 10,
+                'high': 95
+            },
+            'strength': {
+                'low': 15,
                 'high': 99
             }
         }
@@ -823,6 +919,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 1,
+                'high': 95
+            },
+            'strength': {
+                'low': 15,
+                'high': 95
             }
         },
         # Weight > 230, Height <= 79
@@ -885,6 +989,14 @@ entry_draft_rating_spans = {
             },
             'confidence': {
                 'low': 1,
+                'high': 99
+            },
+            'speed': {
+                'low': 1,
+                'high': 90
+            },
+            'strength': {
+                'low': 15,
                 'high': 99
             }
         },
@@ -949,6 +1061,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 1,
+                'high': 90
+            },
+            'strength': {
+                'low': 15,
+                'high': 99
             }
         },
         # Weight > 230, Height > 79
@@ -1011,6 +1131,14 @@ entry_draft_rating_spans = {
             },
             'confidence': {
                 'low': 1,
+                'high': 99
+            },
+            'speed': {
+                'low': 1,
+                'high': 85
+            },
+            'strength': {
+                'low': 25,
                 'high': 99
             }
         }
@@ -1077,6 +1205,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 1,
+                'high': 90
+            },
+            'strength': {
+                'low': 20,
+                'high': 99
             }
         },
         # Weight > 255, Height <= 83
@@ -1139,6 +1275,14 @@ entry_draft_rating_spans = {
             },
             'confidence': {
                 'low': 1,
+                'high': 99
+            },
+            'speed': {
+                'low': 1,
+                'high': 90
+            },
+            'strength': {
+                'low': 25,
                 'high': 99
             }
         },
@@ -1203,6 +1347,14 @@ entry_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 99
+            },
+            'speed': {
+                'low': 1,
+                'high': 90
+            },
+            'strength': {
+                'low': 20,
+                'high': 99
             }
         },
         # Weight > 255, Height > 83
@@ -1265,6 +1417,14 @@ entry_draft_rating_spans = {
             },
             'confidence': {
                 'low': 1,
+                'high': 99
+            },
+            'speed': {
+                'low': 1,
+                'high': 80
+            },
+            'strength': {
+                'low': 25,
                 'high': 99
             }
         }
@@ -1334,6 +1494,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 20,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 85
             }
         },
         # Weight > 195, Height <= 76
@@ -1397,6 +1565,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 15,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 90
             }
         },
         # Weight <= 195, Height > 76
@@ -1460,6 +1636,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 15,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 85
             }
         },
         # Weight > 195, Height > 76
@@ -1523,6 +1707,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 10,
+                'high': 95
+            },
+            'strength': {
+                'low': 1,
+                'high': 90
             }
         }
     },
@@ -1588,6 +1780,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 20,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 85
             }
         },
         # Weight > 195, Height <= 76
@@ -1651,6 +1851,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 15,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 90
             }
         },
         # Weight <= 195, Height > 76
@@ -1714,6 +1922,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 15,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 85
             }
         },
         # Weight > 195, Height > 76
@@ -1777,6 +1993,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 10,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 90
             }
         }
     },
@@ -1842,6 +2066,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 15,
+                'high': 99
+            },
+            'strength': {
+                'low': 1,
+                'high': 90
             }
         },
         # Weight > 230, Height <= 79
@@ -1905,6 +2137,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 10,
+                'high': 99
+            },
+            'strength': {
+                'low': 5,
+                'high': 90
             }
         },
         # Weight <= 230, Height > 79
@@ -1968,6 +2208,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 10,
+                'high': 99
+            },
+            'strength': {
+                'low': 5,
+                'high': 85
             }
         },
         # Weight > 230, Height > 79
@@ -2031,6 +2279,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 5,
+                'high': 95
+            },
+            'strength': {
+                'low': 10,
+                'high': 95
             }
         }
     },
@@ -2096,6 +2352,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 1,
+                'high': 99
+            },
+            'strength': {
+                'low': 5,
+                'high': 90
             }
         },
         # Weight > 230, Height <= 79
@@ -2159,6 +2423,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 1,
+                'high': 95
+            },
+            'strength': {
+                'low': 10,
+                'high': 95
             }
         },
         # Weight <= 230, Height > 79
@@ -2222,6 +2494,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 5,
+                'high': 95
+            },
+            'strength': {
+                'low': 5,
+                'high': 95
             }
         },
         # Weight > 230, Height > 79
@@ -2285,6 +2565,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 1,
+                'high': 90
+            },
+            'strength': {
+                'low': 15,
+                'high': 99
             }
         }
     },
@@ -2350,6 +2638,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 1,
+                'high': 90
+            },
+            'strength': {
+                'low': 15,
+                'high': 99
             }
         },
         # Weight > 255, Height <= 83
@@ -2413,6 +2709,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 1,
+                'high': 85
+            },
+            'strength': {
+                'low': 20,
+                'high': 99
             }
         },
         # Weight <= 255, Height > 83
@@ -2476,6 +2780,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 1,
+                'high': 90
+            },
+            'strength': {
+                'low': 15,
+                'high': 99
             }
         },
         # Weight > 255, Height > 83
@@ -2539,6 +2851,14 @@ normal_draft_rating_spans = {
             'confidence': {
                 'low': 1,
                 'high': 79
+            },
+            'speed': {
+                'low': 1,
+                'high': 80
+            },
+            'strength': {
+                'low': 25,
+                'high': 99
             }
         }
     }
