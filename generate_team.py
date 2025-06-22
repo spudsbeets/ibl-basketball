@@ -3,26 +3,10 @@ from Team import *
 from helper_functions import *
 
 def generate_team():
-    region = regions[generate_random_int(0, 9)]
+    region = regions[generate_random_int(0, len(regions) - 1)]
     city = cities[region][generate_random_int(0, 4)]
-    nickname = nicknames[generate_random_int(0, len(nicknames))]
+    nickname = nicknames[generate_random_int(0, len(nicknames) - 1)]
     logo = nickname
-    colors = color_schemes[generate_random_int(0, len(color_schemes))]
+    colors = color_schemes[generate_random_int(0, len(color_schemes) - 1)]
 
     return Team(nickname, city, region, logo, colors)
-
-
-# TESTING
-temp_team_pool = []
-
-for _ in range(15):
-    temp_team_pool.append(generate_team())
-
-for team in temp_team_pool:
-    print({
-        'name': team.nickname,
-        'city': team.city,
-        'region': team.region,
-        'logo': team.logo,
-        'colors': team.colors
-    })
