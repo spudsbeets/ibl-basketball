@@ -193,3 +193,31 @@ weights = {
 }
 
 intangibles = ['Low', 'Somewhat Low', 'Average', 'Somewhat High', 'High']
+
+cities = {
+    'West Coast USA': ["Los Angeles", "San Francisco", "Seattle", "San Diego", "Portland"],
+    'Midwest USA': ["Chicago", "Detroit", "Minneapolis", "Cleveland", "St. Louis"],
+    'East Coast USA': ["New York City", "Boston", "Philadelphia", "Washington, D.C.", "Baltimore"],
+    'South USA': ["Atlanta", "Miami", "Houston", "Dallas", "New Orleans"],
+    'Canada': ["Toronto", "Vancouver", "Montreal", "Calgary", "Ottawa"],
+    'South America': ["São Paulo", "Buenos Aires", "Lima", "Bogotá", "Santiago"],
+    'Europe': ["London", "Paris", "Berlin", "Rome", "Madrid"],
+    'Asia': ["Tokyo", "Shanghai", "Mumbai", "Seoul", "Bangkok"],
+    'Africa': ["Lagos", "Cairo", "Nairobi", "Johannesburg", "Addis Ababa"],
+    'Australia': ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide"]
+}
+
+nicknames = ["Thunder", "Titans", "Wolves", "Falcons", "Storm", "Dragons", "Raiders", "Vipers",
+             "Crusaders", "Hawks", "Panthers", "Gladiators", "Warriors", "Cyclones", "Sharks",
+             "Bulldogs", "Grizzlies", "Knights", "Raptors", "Pirates", "Bison", "Tornadoes",
+             "Cobras", "Outlaws", "Phoenix", "Eagles", "Jets", "Samurais", "Spartans", "Tigers",
+             "Rhinos", "Hornets", "Blizzards", "Commanders", "Patriots", "Lions", "Titans",
+             "Scorpions", "Rebels", "Barracudas", "Gorillas", "Inferno", "Mavericks", "Mustangs",
+             "Sabers", "Bearcats", "Sentinels", "Crushers", "Avalanche", "Pythons"]
+
+color_schemes = ["blue/white", "red/black", "green/white", "purple/gold", "black/silver", "orange/navy",
+                 "maroon/white", "navy/gold", "teal/black", "crimson/cream", "gray/blue", "black/red",
+                 "royal blue/yellow", "forest green/gold", "sky blue/white", "burgundy/gray", "red/white",
+                 "blue/gold", "orange/white", "brown/yellow", "charcoal/teal", "black/gold", "green/silver",
+                 "navy/white", "turquoise/purple", "silver/maroon", "cyan/black", "olive/cream", "indigo/gray",
+                 "pink/black", "yellow/black", "red/gray"]
