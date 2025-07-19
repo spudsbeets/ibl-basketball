@@ -141,7 +141,7 @@ def generate_entry_draft_player():
 
 
     return Player(player_name, height, weight, position, region, 0, age,
-                  mercuriality, 'Neutral', character, o_reb, finishing, open_mid, open_3, contest_mid, contest_3,
+                  mercuriality, 'Average', character, o_reb, finishing, open_mid, open_3, contest_mid, contest_3,
                   playmaking, ft_shoot, d_reb, block, steal, stickiness, awareness, endurance, confidence, speed, strength)
 
 def generate_normal_draft_player():
@@ -272,5 +272,5 @@ def generate_normal_draft_player():
 
 
     return Player(player_name, height, weight, position, region, 0, age,
-                  mercuriality, 'Neutral', character, o_reb, finishing, open_mid, open_3, contest_mid, contest_3,
+                  mercuriality, 'Average', character, o_reb, finishing, open_mid, open_3, contest_mid, contest_3,
                   playmaking, ft_shoot, d_reb, block, steal, stickiness, awareness, endurance, confidence, speed, strength)
