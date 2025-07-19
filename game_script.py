@@ -1,13 +1,14 @@
 from generate_prospect_pool import *
 from generate_league import *
 from pools import *
+from generate_scouts import *
 
 
 generate_entry_draft_class()
 
 generate_league()
 
-
+generate_initial_scouts()
 
 sorted_pool = sorted(prospect_pool, key=lambda x: x.overall)
 
@@ -45,4 +46,12 @@ for team in teams:
         'region': team.region,
         'logo': team.logo,
         'colors': team.colors
+    })
+
+for scout in available_scouts:
+    print({
+        'name': scout.name,
+        'region': scout.region,
+        'specialty': scout.specialty,
+        'level': scout.level
     })

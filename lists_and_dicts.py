@@ -221,3 +221,7 @@ color_schemes = ["blue/white", "red/black", "green/white", "purple/gold", "black
                  "blue/gold", "orange/white", "brown/yellow", "charcoal/teal", "black/gold", "green/silver",
                  "navy/white", "turquoise/purple", "silver/maroon", "cyan/black", "olive/cream", "indigo/gray",
                  "pink/black", "yellow/black", "red/gray"]
+
+scout_specialties = ["Offense", "Defense", "Intangibles"]
+
+scout_levels = [1, 2, 3, 4, 5]
