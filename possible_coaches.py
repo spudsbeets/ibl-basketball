@@ -81,7 +81,70 @@ coach_descriptions = {
         "One of the busier people in the coaching pool, Mira is attempting to straddle two worlds: music and sport. "
         "She leads a successful jazz group with her booming tenor saxophone, but has made the difficult decision to scale "
         "back her music career and lead a team as well. Her offenses play with the improvisational vivacity of her "
-        "band. Her defenses... a bit more of a work in progress."
+        "band. Her defenses... a bit more of a work in progress.",
+    "Lumber Jack":
+        "His defensive prowess is as imposing as his beard and axe. Not exactly known for an intimidating intellect, "
+        "he wins via pure, in-your-face, aggressive defense. That said, time spent wandering in the woods while felling "
+        "trees may provide the solitude he needs to develop further.",
+    "John Smith":
+        "The youngest member of the coaching pool, John is as young as the youngest players to populate a team. "
+        "While this will understandably scare some off, John was pinned as a protege by many leading basketball minds "
+        "from the ripe age of 17. His sense of strategy soars over his contemporaries. And while other aspects of "
+        "his coaching game may be lacking, many agree he is on a path for stardom.",
+    "Bob Boston":
+        "A Boston-ite through and through, down to his last name, Bob sunk his teeth as voraciously into basketball "
+        "as soon as it started to burgeon on the global scene. While he's a little rough around the edges and a bit "
+        "old school in regards to strategy, few folks will get the level of play on both ends of the floor from their "
+        "guys that Bob will.",
+    "Terri Brooks":
+        "One of the first female figures to truly make a mark on the game of basketball, Terri is a daunting figure in "
+        "all the best possible ways. She is confident, a ferocious competitor, and a careful student of the game. Her "
+        "teams will impose their will on offense and defense without an ounce of fear, whether favorite or underdog.",
+    "Birdy Constantinople":
+        "There's no one in basketball quite like Birdy. Hailing from Chile, she spent most of her twenties as an avid "
+        "bird watcher, an understatement really for the meticulous work she was doing on exotic bird species. Now she "
+        "has set her eyes to a new frontier. Considering herself an expert in the realm of shooting mechanics, she "
+        "has had more luck developing shooters and offensive players in general than just about anyone in the sport. "
+        "Tread cautiously though, she makes some rather... unexpected moves and decisions at times.",
+    "Al Filer":
+        "Al Filer is an all around good guy. A caring father for his two young daughters and a loving husband, "
+        "Al is about as inoffensive as they come. Carrying in tow a ferocious work ethic, Al is a trustworthy "
+        "strategic mind who can work with anyone. On top of that, he is as loyal as they come.",
+    "Buck Snow":
+        "To pursue the basketball dream, Buck left his high ranking position at the oil company. He carries much "
+        "of his no-nonsense attitude into his coaching. He runs hard practices and asks the utmost of his players. "
+        "Because of this approach, Buck's defenses are a known problem. Buck wants to win and win now, if the right "
+        "team is not built around him, you can anticipate he'll be ready for that next venture.",
+    "Corbyn Keller":
+        "For a gentleman in his 30s, Keller has already had a remarkable amount of success on the court. He led his "
+        "amateur squad to not one, not two, but three Middle USA Conference championships. He brings an immediate "
+        "floor to your basketball team, and you don't have to worry about any nonsense with Corbyn around.",
+    "Mabel Willows":
+        "Mabel Willows is just a downright kind soul. Over the years in her Canadian community, she has been "
+        "renowned as a philanthropist, bent on providing the care she can for the most vulnerable. She has a "
+        "crystal clean track record in regards to the players she has coached absolutely adoring her. While her "
+        "other pursuits have left her with some gaps in her knowledge regarding the game, hiring her may be the "
+        "impetus she needs to become both great human being and great basketball coach.",
+    "Dmitri Ivanov":
+        "Hailing from icy Moscow, Dmitri spent most of his childhood as a burgeoning chessmaster. But after a "
+        "brutalizing defeat at the hand of his arch rival, Dmitri pivoted to applying his chess acumen on the "
+        "basketball court. Widely renowned as a gifted strategist who knows how to deploy and develop players "
+        "effectively, his potential is not the fear in hiring him. Rather his frigid disposition leaves some players "
+        "out in the deep cold, and his anger is known to be quite intimidating.",
+    "Thanalah Patel":
+        "Thanalah comes from an influential family in India. She spent years playing the games of modern palace intrigue "
+        "before deciding that she was tired of the money games. Instead, she dove deeply into basketball, and felt the love "
+        "and fire she had been missing much of her life. She still carries herself with immense poise from those days and "
+        "has added on a great mind for strategy. Her amateur teams have often won while severe underdogs due to her "
+        "ability to squeeze every last bit out of a game plan.",
+    "Brick Wright":
+        "Most people who meet Brick think, 'Wow, that is a huge man.' And he is a huge man. As daunting as his presence "
+        "can be physically, his defenses may be even more daunting, absolutely crushing anything in their path. Fouls "
+        "may be his kyptonite...",
+    "Ishmael Chibueze":
+        "Ishmael is known as a man of impeccable poise. A player himself for years, he was an unshakable shooter, renowned "
+        "for his clutch 3-point making ability. He carries that poise with him in his coaching, unflappable under pressure "
+        "and capable of imparting wisdom to the gifted shooters on his team, he has a bright future in the league."
 }
 
 all_coaches = [
@@ -126,7 +189,7 @@ all_coaches = [
         "Average", "Average", "Somewhat High"
     ),
     Coach(
-        "Jacques Monet", "Canada", coach_descriptions["Jaques Monet"], 45,
+        "Jacques Monet", "Canada", coach_descriptions["Jacques Monet"], 45,
         CoachRating('coach_offense', generate_random_int(10, 60)),
         CoachRating('coach_defense', generate_random_int(40, 90)),
         CoachRating('coach_intangibles', generate_random_int(10, 70)),
@@ -221,16 +284,108 @@ all_coaches = [
         CoachRating('coach_strategy', generate_random_int(20, 70)),
         "Average", "Average", "High"
     ),
+    Coach(
+        "Lumber Jack", "Canada", coach_descriptions["Lumber Jack"], 41,
+        CoachRating('coach_offense', generate_random_int(5, 60)),
+        CoachRating('coach_defense', generate_random_int(40, 90)),
+        CoachRating('coach_intangibles', generate_random_int(10, 60)),
+        CoachRating('coach_strategy', generate_random_int(5, 50)),
+        "Low", "Average", "Somewhat High"
+    ),
+    Coach(
+        "John Smith", "Australia", coach_descriptions["John Smith"], 21,
+        CoachRating('coach_offense', generate_random_int(5, 50)),
+        CoachRating('coach_defense', generate_random_int(5, 50)),
+        CoachRating('coach_intangibles', generate_random_int(5, 50)),
+        CoachRating('coach_strategy', generate_random_int(40, 95)),
+        "Somewhat High", "Average", "Somewhat Low"
+    ),
+    Coach(
+        "Bob Boston", "East Coast USA", coach_descriptions["Bob Boston"], 48,
+        CoachRating('coach_offense', generate_random_int(25, 80)),
+        CoachRating('coach_defense', generate_random_int(25, 80)),
+        CoachRating('coach_intangibles', generate_random_int(10, 60)),
+        CoachRating('coach_strategy', generate_random_int(10, 60)),
+        "Average", "Average", "Somewhat Low"
+    ),
+    Coach(
+        "Terri Brooks", "West Coast USA", coach_descriptions["Terri Brooks"], 55,
+        CoachRating('coach_offense', generate_random_int(25, 80)),
+        CoachRating('coach_defense', generate_random_int(25, 80)),
+        CoachRating('coach_intangibles', generate_random_int(10, 60)),
+        CoachRating('coach_strategy', generate_random_int(10, 60)),
+        "Average", "Average", "Somewhat High"
+    ),
+    Coach(
+        "Birdy Constantinople", "South America", coach_descriptions["Birdy Constantinople"], 29,
+        CoachRating('coach_offense', generate_random_int(40, 90)),
+        CoachRating('coach_defense', generate_random_int(5, 50)),
+        CoachRating('coach_intangibles', generate_random_int(10, 60)),
+        CoachRating('coach_strategy', generate_random_int(10, 60)),
+        "High", "Average", "Average"
+    ),
+    Coach(
+        "Al Filer", "East Coast USA", coach_descriptions["Al Filer"], 41,
+        CoachRating('coach_offense', generate_random_int(10, 60)),
+        CoachRating('coach_defense', generate_random_int(10, 60)),
+        CoachRating('coach_intangibles', generate_random_int(25, 80)),
+        CoachRating('coach_strategy', generate_random_int(25, 80)),
+        "Low", "Average", "High"
+    ),
+    Coach(
+        "Buck Snow", "South USA", coach_descriptions["Buck Snow"], 50,
+        CoachRating('coach_offense', generate_random_int(10, 60)),
+        CoachRating('coach_defense', generate_random_int(40, 90)),
+        CoachRating('coach_intangibles', generate_random_int(5, 50)),
+        CoachRating('coach_strategy', generate_random_int(10, 60)),
+        "Average", "Average", "Average"
+    ),
+    Coach(
+        "Corbyn Keller", "Midwest USA", coach_descriptions["Corbyn Keller"], 35,
+        CoachRating('coach_offense', generate_random_int(20, 80)),
+        CoachRating('coach_defense', generate_random_int(20, 80)),
+        CoachRating('coach_intangibles', generate_random_int(10, 60)),
+        CoachRating('coach_strategy', generate_random_int(20, 80)),
+        "Low", "Average", "High"
+    ),
+    Coach(
+        "Mabel Willows", "Canada", coach_descriptions["Mabel Willows"], 42,
+        CoachRating('coach_offense', generate_random_int(10, 60)),
+        CoachRating('coach_defense', generate_random_int(10, 60)),
+        CoachRating('coach_intangibles', generate_random_int(40, 90)),
+        CoachRating('coach_strategy', generate_random_int(10, 60)),
+        "Somewhat Low", "Average", "High"
+    ),
+    Coach(
+        "Dmitri Ivanov", "Europe", coach_descriptions["Dmitri Ivanov"], 33,
+        CoachRating('coach_offense', generate_random_int(20, 70)),
+        CoachRating('coach_defense', generate_random_int(20, 70)),
+        CoachRating('coach_intangibles', generate_random_int(10, 60)),
+        CoachRating('coach_strategy', generate_random_int(40, 90)),
+        "Somewhat Low", "Average", "Somewhat Low"
+    ),
+    Coach(
+        "Thanalah Patel", "Asia", coach_descriptions["Thanalah Patel"], 46,
+        CoachRating('coach_offense', generate_random_int(10, 60)),
+        CoachRating('coach_defense', generate_random_int(10, 60)),
+        CoachRating('coach_intangibles', generate_random_int(25, 80)),
+        CoachRating('coach_strategy', generate_random_int(25, 80)),
+        "Low", "Average", "High"
+    ),
+    Coach(
+        "Brick Wright", "Australia", coach_descriptions["Brick Wright"], 46,
+        CoachRating('coach_offense', generate_random_int(10, 60)),
+        CoachRating('coach_defense', generate_random_int(40, 90)),
+        CoachRating('coach_intangibles', generate_random_int(10, 60)),
+        CoachRating('coach_strategy', generate_random_int(10, 60)),
+        "Average", "Average", "Average"
+    ),
+    Coach(
+        "Ishmael Chibueze", "Africa", coach_descriptions["Ishmael Chibueze"], 37,
+        CoachRating('coach_offense', generate_random_int(20, 70)),
+        CoachRating('coach_defense', generate_random_int(10, 60)),
+        CoachRating('coach_intangibles', generate_random_int(40, 90)),
+        CoachRating('coach_strategy', generate_random_int(10, 60)),
+        "Somewhat Low", "Average", "High"
+    )
 ]
-
-### REGION COUNTS
-# WEST COAST XX
-# EAST COAST X
-# SOUTH XX
-# MIDWEST XX
-# CANADA X
-# S AMERICA XX
-# EUROPE XX
-# ASIA XX
-# AUSTRALIA X
-# AFRICA XX

@@ -27,8 +27,8 @@ class Coach:
 
     # Private Methods
     def _calculate_coach_overall(self):
-        return round((self.coach_offense * .3) + (self.coach_defense * .3) + (self.coach_intangibles * .15) + \
-                     (self.coach_strategy * .25))
+        return round((self.coach_offense.rating * .3) + (self.coach_defense.rating * .3) + \
+                     (self.coach_intangibles.rating * .15) + (self.coach_strategy.rating * .25))
 
     # Public Methods
     def increment_wins(self):
