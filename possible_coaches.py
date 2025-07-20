@@ -27,7 +27,61 @@ coach_descriptions = {
     "Sally Swish":
         "One of the first ladies to hop on the basketball train with authority, she fell in love with basketball as "
         "many in heart of America were at the time. A tenacious student of the game, she sleeps, eats, and breathes "
-        "basketball. A gifted strategist and a careful coach, her deep intentionality will serve your team well."
+        "basketball. A gifted strategist and a careful coach, her deep intentionality will serve your team well.",
+    "Jacques Monet":
+        "A successful painter, who maintains his artistic pursuits on the side, Jaques is a calm pillar amid "
+        "turbulent situations. Prone to spacing out and disappearing into other pursuits, he may not be the most "
+        "reliable of the bunch. But his eye for defensive integrity is nearly unmatched.",
+    "Nikki Dimes":
+        "A young firebrand, Nikki is the epitome of youthful energy. Channelling her natural verve, she imbues an "
+        "aggressive nature to her strategy, often resulting in torrents of scoring. But if she finds herself in a "
+        "situation where she feels she cannot thrive, she will be the first one on the bus out of town.",
+    "Emeka Umar":
+        "Once a highly successful businessman, Emeka made his money then began to pursue his passion, the game of "
+        "basketball. He is a consummate professional, meticulous and precise in all he does. While he possesses no "
+        "obvious strength above the rest of the field, he offers a high floor to every aspect of the coaching game.",
+    "Jackie Croc":
+        "Following a serious injury sustained while wrangling a threatening crocodile, she opted for a more stable "
+        "environment for her next expedition. She implements the lessons she learned from her time among Austalia's "
+        "many frightening critters into a tenacious defensive mindset in her teams.",
+    "Santiago Gonzales":
+        "A social media influencer and successful player in his own right, Santiago leveraged his following "
+        "and fans to grow the game of basketball and to grow his own brand. Energetic, startlingly handsome, "
+        "and gregarious, Santiago connects with players in ways that many coaches could only dream to. His charm "
+        "and wit also give him a remarkable confidence that leads him to not necessarily stay in one place for long.",
+    "Will Dill":
+        "A true pickle enthusiast, Bill was world-renowned for his pickle palette, able to distinguish different "
+        "varieties, vintages, and picklers like a true sommelier. While on his eleventh pickle tour, he stumbled into "
+        "a basketball game in Europe and was immediately smitten. Turning his very specific attention span to "
+        "basketball, he cooked up some incredible strategic blueprints and quickly rose through the ranks to being a "
+        "top candidate.",
+    "Philip Mycup":
+        "The oldest coaching candidate, Philip may not be in this for the long haul of a dynasty, but there's not soul "
+        "who has anything bad to say about Philip. Not only does he have a sharp mind, he is a kind and gentle fellow, "
+        "capable of endearing players and fans alike.",
+    "Elle Belle":
+        "Tired of the exploitative dynamics of the modeling industry, the beautiful Elle Belle made an early pivot "
+        "in life to the game of basketball. Her youth can show at times in regards to her strategic eye, but she is "
+        "gifted interacting with people and demonstrates great coaching potential.",
+    "Candace Oren":
+        "Once a successful roper in Oklahoma, Candace decided to apply her skills to a different, less physically taxing, "
+        "endeavor. Her ability to hang with riled up cattle has translated to a tenacity on offense which other "
+        "teams find remarkably difficult to play against. From a personality perspective, Candace is a bit of a lone "
+        "wolf and may alienate players from time to time with her unusual social tendencies.",
+    "Hirsh Wolfe":
+        "Catching basketball games here and there around his hometown of Portland, OR, Hirsh left his job as a "
+        "specialty bartender to take his talents to the sidelines. His many hours spent chatting with customers "
+        "has given him an undeniable charisma. His youth means there is still much to learn and develop to his coaching "
+        "game, but given enough time, it's hard to vote against him.",
+    "Li Xiao":
+        "A former business mogul, Li quickly proved herself to be a gifted basketball mind. A jack-of-all-trades, "
+        "there are no obvious weaknesses to her coaching game. She is a bit of a recluse and very difficult to read, "
+        "but, rest assured, she will never miss an appointment, game, or practice.",
+    "Mira Ntuli":
+        "One of the busier people in the coaching pool, Mira is attempting to straddle two worlds: music and sport. "
+        "She leads a successful jazz group with her booming tenor saxophone, but has made the difficult decision to scale "
+        "back her music career and lead a team as well. Her offenses play with the improvisational vivacity of her "
+        "band. Her defenses... a bit more of a work in progress."
 }
 
 all_coaches = [
@@ -71,4 +125,112 @@ all_coaches = [
         CoachRating('coach_strategy', generate_random_int(30, 70)),
         "Average", "Average", "Somewhat High"
     ),
+    Coach(
+        "Jacques Monet", "Canada", coach_descriptions["Jaques Monet"], 45,
+        CoachRating('coach_offense', generate_random_int(10, 60)),
+        CoachRating('coach_defense', generate_random_int(40, 90)),
+        CoachRating('coach_intangibles', generate_random_int(10, 70)),
+        CoachRating('coach_strategy', generate_random_int(5, 60)),
+        "Low", "Average", "Average"
+    ),
+    Coach(
+        "Nikki Dimes", "South America", coach_descriptions["Nikki Dimes"], 25,
+        CoachRating('coach_offense', generate_random_int(30, 70)),
+        CoachRating('coach_defense', generate_random_int(10, 60)),
+        CoachRating('coach_intangibles', generate_random_int(5, 60)),
+        CoachRating('coach_strategy', generate_random_int(15, 75)),
+        "High", "Average", "Average"
+    ),
+    Coach(
+        "Emeka Umar", "Africa", coach_descriptions["Emeka Umar"], 44,
+        CoachRating('coach_offense', generate_random_int(20, 70)),
+        CoachRating('coach_defense', generate_random_int(20, 70)),
+        CoachRating('coach_intangibles', generate_random_int(20, 70)),
+        CoachRating('coach_strategy', generate_random_int(20, 60)),
+        "Somewhat Low", "Average", "Somewhat High"
+    ),
+    Coach(
+        "Jackie Croc", "Australia", coach_descriptions["Jackie Croc"], 49,
+        CoachRating('coach_offense', generate_random_int(10, 60)),
+        CoachRating('coach_defense', generate_random_int(40, 90)),
+        CoachRating('coach_intangibles', generate_random_int(10, 60)),
+        CoachRating('coach_strategy', generate_random_int(10, 60)),
+        "Somewhat Low", "Average", "High"
+    ),
+    Coach(
+        "Santiago Gonzales", "South America", coach_descriptions["Santiago Gonzales"], 33,
+        CoachRating('coach_offense', generate_random_int(10, 60)),
+        CoachRating('coach_defense', generate_random_int(10, 60)),
+        CoachRating('coach_intangibles', generate_random_int(40, 90)),
+        CoachRating('coach_strategy', generate_random_int(10, 60)),
+        "Somewhat High", "Average", "Average"
+    ),
+    Coach(
+        "Will Dill", "South USA", coach_descriptions["Will Dill"], 50,
+        CoachRating('coach_offense', generate_random_int(10, 60)),
+        CoachRating('coach_defense', generate_random_int(10, 60)),
+        CoachRating('coach_intangibles', generate_random_int(10, 60)),
+        CoachRating('coach_strategy', generate_random_int(40, 90)),
+        "Average", "Average", "Somewhat High"
+    ),
+    Coach(
+        "Philip Mycup", "Midwest USA", coach_descriptions["Philip Mycup"], 61,
+        CoachRating('coach_offense', generate_random_int(20, 70)),
+        CoachRating('coach_defense', generate_random_int(20, 70)),
+        CoachRating('coach_intangibles', generate_random_int(40, 90)),
+        CoachRating('coach_strategy', generate_random_int(20, 70)),
+        "Low", "Average", "High"
+    ),
+    Coach(
+        "Elle Belle", "Europe", coach_descriptions["Elle Belle"], 32,
+        CoachRating('coach_offense', generate_random_int(10, 70)),
+        CoachRating('coach_defense', generate_random_int(10, 70)),
+        CoachRating('coach_intangibles', generate_random_int(40, 90)),
+        CoachRating('coach_strategy', generate_random_int(5, 60)),
+        "Somewhat High", "Average", "Average"
+    ),
+    Coach(
+        "Candace Oren", "South USA", coach_descriptions["Candace Oren"], 41,
+        CoachRating('coach_offense', generate_random_int(40, 90)),
+        CoachRating('coach_defense', generate_random_int(10, 60)),
+        CoachRating('coach_intangibles', generate_random_int(5, 50)),
+        CoachRating('coach_strategy', generate_random_int(10, 60)),
+        "Average", "Average", "Somewhat High"
+    ),
+    Coach(
+        "Hirsh Wolfe", "West Coast USA", coach_descriptions["Hirsh Wolfe"], 30,
+        CoachRating('coach_offense', generate_random_int(10, 60)),
+        CoachRating('coach_defense', generate_random_int(10, 60)),
+        CoachRating('coach_intangibles', generate_random_int(40, 90)),
+        CoachRating('coach_strategy', generate_random_int(10, 60)),
+        "Somewhat High", "Average", "Somewhat Low"
+    ),
+    Coach(
+        "Li Xiao", "Asia", coach_descriptions["Li Xiao"], 44,
+        CoachRating('coach_offense', generate_random_int(20, 70)),
+        CoachRating('coach_defense', generate_random_int(20, 70)),
+        CoachRating('coach_intangibles', generate_random_int(20, 70)),
+        CoachRating('coach_strategy', generate_random_int(20, 70)),
+        "Average", "Average", "Average"
+    ),
+    Coach(
+        "Mira Ntuli", "Africa", coach_descriptions["Mira Ntuli"], 37,
+        CoachRating('coach_offense', generate_random_int(30, 80)),
+        CoachRating('coach_defense', generate_random_int(5, 50)),
+        CoachRating('coach_intangibles', generate_random_int(10, 60)),
+        CoachRating('coach_strategy', generate_random_int(20, 70)),
+        "Average", "Average", "High"
+    ),
 ]
+
+### REGION COUNTS
+# WEST COAST XX
+# EAST COAST X
+# SOUTH XX
+# MIDWEST XX
+# CANADA X
+# S AMERICA XX
+# EUROPE XX
+# ASIA XX
+# AUSTRALIA X
+# AFRICA XX
