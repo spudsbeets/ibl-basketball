@@ -3,8 +3,8 @@ from initial_templates import *
 class Team:
 
     def __init__(self, nickname, city, region, logo, colors,
-                 coach=None, roster=[], starters=[], scouts=[],
-                 accolades={'2030': None}):
+                 coach=None, roster=None, starters=None, scouts=None,
+                 accolades=None):
         # General team info
         self.nickname = nickname
         self.city = city
@@ -13,11 +13,11 @@ class Team:
         self.colors = colors
         # Coaches, Scouts, Players
         self.coach = coach
-        self.roster = roster
-        self.starters = starters
-        self.scouts = scouts
+        self.roster = roster if roster is not None else []
+        self.starters = starters if starters is not None else []
+        self.scouts = scouts if scouts is not None else []
         # Stats and Accolades
-        self.accolades = accolades
+        self.accolades = accolades if accolades is not None else {'2030': None}
         self.wins = 0,
         self.losses = 0,
         self.total_stats = team_totals
