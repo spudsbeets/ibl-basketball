@@ -115,6 +115,7 @@ full_game_stat_block = {
     'Q2': game_stat_block,
     'Q3': game_stat_block,
     'Q4': game_stat_block,
+    'OT': game_stat_block,
     'Full Game': game_stat_block
 }
 

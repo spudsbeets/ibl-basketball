@@ -108,5 +108,6 @@ for team in teams:
 team1.set_starters()
 team2.set_starters()
 
+# Simulate a game
 sim_game = Game(team1, team2)
 sim_game.simulate_game()
