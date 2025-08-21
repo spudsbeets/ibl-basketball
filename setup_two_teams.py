@@ -33,107 +33,39 @@ def two_team_setup(team1, team2):
 
     # Fill rosters
     # Tracker for which team is picking
-    curr_pick = 'team1'
+    curr_pick = team1
+    teams = [team1, team2]
     # Tracker for # of guards and forwards
-    team1_forwards = 0 # choose 7 fowards
-    team1_guards = 0 # choose 5 guards
-    team2_forwards = 0
-    team2_guards = 0
+    MAX_GUARDS = 5
+    MAX_FORWARDS = 7
     for _ in range(24):
-        # Determine whose pick
-        if curr_pick == 'team1':
-            # Check to see if team needs to choose guards
-            if team1_forwards == 7 or team1_forwards - team1_guards >= 4:
-                # Check to see if team needs a PG or SG specifically at end of draft
-                if team1_guards == 4:
-                    if has_position(team1, 'PG') == False:
-                        team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['PG']))
-                    elif has_position(team1, 'SG') == False:
-                        team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SG']))
-                    else:
-                        team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['PG', 'SG']))
-                    team1_guards += 1
-                else:
-                    team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['PG', 'SG']))
-                    team1_guards += 1
-            # Check to see if team needs to choose forwards
-            elif team1_guards == 5 or team1_guards - team1_forwards >= 2:
-                # Check to see if team needs a SF, PF, or C specifically at end of draft
-                if team1_forwards >= 5:
-                    if has_position(team1, 'SF') == False and has_position(team1, 'PF') == False:
-                        team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SF', 'PF']))
-                    elif has_position(team1, 'SF') == False and has_position(team1, 'C') == False:
-                        team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SF', 'C']))
-                    elif has_position(team1, 'PF') == False and has_position(team1, 'C') == False:
-                        team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['PF', 'C']))
-                    elif has_position(team1, 'SF'):
-                        team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SF']))
-                    elif has_position(team1, 'PF'):
-                        team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['PF']))
-                    elif has_position(team1, 'C'):
-                        team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['C']))
-                    else:
-                        team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SF', 'PF', 'C']))
-                    team1_forwards += 1
-                else:
-                    team1.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SF', 'PF', 'C']))
-                    team1_forwards += 1
-            # Otherwise, choose best player available
-            else:
-                player = find_and_draft_best_player_by_pos(prospect_pool, ['PG', 'SG', 'SF', 'PF', 'C'])
-                team1.roster.append(player)
-                if player.position == 'PG' or player.position == 'SG':
-                    team1_guards += 1
-                else:
-                    team1_forwards += 1
-            curr_pick = 'team2'
+        team = curr_pick
+        other = teams[0] if curr_pick is teams[1] else teams[1]
+
+        # Count guards/forwards
+        guards = sum(1 for p in team.roster if p.position in ['PG', 'SG'])
+        forwards = sum(1 for p in team.roster if p.position in ['SF', 'PF', 'C'])
+
+        # Figure out what positions are missing
+        missing_positions = [pos for pos in ['PG', 'SG', 'SF', 'PF', 'C']
+                             if not has_position(team, pos)]
+
+        # Draft
+        # Prioritize filling missing positions
+        if missing_positions:
+            player = find_and_draft_best_player_by_pos(prospect_pool, missing_positions)
+        # Team needs guards
+        elif guards < MAX_GUARDS and (forwards == MAX_FORWARDS or forwards - guards >= 4):
+            player = find_and_draft_best_player_by_pos(prospect_pool, ['PG', 'SG'])
+        # Team needs forwards
+        elif forwards < MAX_FORWARDS and (guards == MAX_GUARDS or guards - forwards >= 2):
+            player = find_and_draft_best_player_by_pos(prospect_pool, ['SF', 'PF', 'C'])
+        # Draft best available player
         else:
-            # Check to see if team needs to choose guards
-            if team2_forwards == 7 or team2_forwards - team2_guards >= 4:
-                # Check to see if team needs a PG or SG specifically at end of draft
-                if team2_guards == 4:
-                    if has_position(team2, 'PG') == False:
-                        team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['PG']))
-                    elif has_position(team2, 'SG') == False:
-                        team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SG']))
-                    else:
-                        team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['PG', 'SG']))
-                    team2_guards += 1
-                else:
-                    team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['PG', 'SG']))
-                    team2_guards += 1
-            # Check to see if team needs to choose forwards
-            elif team2_guards == 5 or team2_guards - team2_forwards >= 2:
-                # Check to see if team needs a SF, PF, or C specifically at end of draft
-                if team2_forwards >= 5:
-                    if has_position(team2, 'SF') == False and has_position(team2, 'PF') == False:
-                        team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SF', 'PF']))
-                    elif has_position(team2, 'SF') == False and has_position(team2, 'C') == False:
-                        team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SF', 'C']))
-                    elif has_position(team2, 'PF') == False and has_position(team2, 'C') == False:
-                        team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['PF', 'C']))
-                    elif has_position(team2, 'SF'):
-                        team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SF']))
-                    elif has_position(team2, 'PF'):
-                        team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['PF']))
-                    elif has_position(team2, 'C'):
-                        team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['C']))
-                    else:
-                        team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SF', 'PF', 'C']))
-                    team2_forwards += 1
-                else:
-                    team2.roster.append(find_and_draft_best_player_by_pos(prospect_pool, ['SF', 'PF', 'C']))
-                    team2_forwards += 1
-            # Otherwise, choose best player available
-            else:
-                player = find_and_draft_best_player_by_pos(prospect_pool, ['PG', 'SG', 'SF', 'PF', 'C'])
-                team2.roster.append(player)
-                if player.position == 'PG' or player.position == 'SG':
-                    team2_guards += 1
-                else:
-                    team2_forwards += 1
-            curr_pick = 'team1'
+            player = find_and_draft_best_player_by_pos(prospect_pool, ['PG', 'SG', 'SF', 'PF', 'C'])
 
+        # Add player
+        team.roster.append(player)
 
-
-
+        # Switch pick
+        curr_pick = other

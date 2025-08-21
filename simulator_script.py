@@ -4,6 +4,7 @@ from pools import *
 from generate_coaches import *
 from setup_two_teams import *
 from helper_functions import *
+from Game import *
 
 # Generate draft class.
 generate_entry_draft_class()
@@ -48,7 +49,7 @@ generate_entry_draft_class()
 # Generate two randomized teams.
 generate_league()
 
-# Optional print statement to see information concerning two randomized teams. Comment out if desired.
+# Optional print statement to see information concerning two teams. Comment out if desired.
 #for team in teams:
 #    print({
 #        'name': team.nickname,
@@ -84,7 +85,7 @@ team1 = teams[0]
 team2 = teams[1]
 two_team_setup(team1, team2)
 
-# Optional print statement to show relevant team info. Comment out if desiered.
+# Optional print statement to show relevant team info. Comment out if desired.
 #for team in teams:
 #    roster_info = [{'name': player.name, 'position': player.position, 'overall': player.overall} for player in team.roster]
 #    print({
@@ -102,3 +103,10 @@ for team in teams:
     team.alter_defensive_player_ratings_by_coach()
     team.alter_offensive_player_ratings_by_coach()
     team.alter_intangible_player_ratings_by_coach()
+
+# Set starting lineups
+team1.set_starters()
+team2.set_starters()
+
+sim_game = Game(team1, team2)
+sim_game.simulate_game()

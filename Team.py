@@ -1,10 +1,11 @@
 from helper_functions import generate_random_int
 from initial_templates import *
+from get_sorted_pools import *
 
 class Team:
 
     def __init__(self, nickname, city, region, logo, colors,
-                 coach=None, roster=None, starters=None, scouts=None,
+                 coach=None, roster=None, starters=None, bench=None, scouts=None,
                  accolades=None):
         # General team info
         self.nickname = nickname
@@ -15,7 +16,8 @@ class Team:
         # Coaches, Scouts, Players
         self.coach = coach
         self.roster = roster if roster is not None else []
-        self.starters = starters if starters is not None else []
+        self.starters = starters if starters is not None else {}
+        self.bench = bench if bench is not None else []
         self.scouts = scouts if scouts is not None else []
         # Stats and Accolades
         self.accolades = accolades if accolades is not None else {'2030': None}
@@ -88,6 +90,15 @@ class Team:
 
     def add_scout(self, scout):
         self.scouts.append(scout)
+
+    def set_starters(self):
+        used_positions = set()
+        for player in get_sorted_team_roster(self.roster):
+            if player.position not in used_positions:
+                self.starters[player.position] = player
+                used_positions.add(player.position)
+            else:
+                self.bench.append(player)
 
     def update_individual_stats(self):
         for player in self.roster:

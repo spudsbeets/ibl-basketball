@@ -55,6 +55,7 @@ individual_stat_block_overalls = {
 individual_stat_block_game = {
     'minutes': 0,
     'points': 0,
+    'plays': 0,
     '2fg_taken': 0,
     '2fg_made': 0,
     '3fg_taken': 0,
@@ -107,6 +108,14 @@ game_stat_block = {
         'turnovers': 0,
         'fouls': 0
     }
+}
+
+full_game_stat_block = {
+    'Q1': game_stat_block,
+    'Q2': game_stat_block,
+    'Q3': game_stat_block,
+    'Q4': game_stat_block,
+    'Full Game': game_stat_block
 }
 
 team_totals = {
