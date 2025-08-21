@@ -96,3 +96,9 @@ two_team_setup(team1, team2)
 # Move undrafted players into available_players and empty prospect_pool
 available_players = prospect_pool
 prospect_pool = []
+
+# Alter player ratings by coach
+for team in teams:
+    team.alter_defensive_player_ratings_by_coach()
+    team.alter_offensive_player_ratings_by_coach()
+    team.alter_intangible_player_ratings_by_coach()

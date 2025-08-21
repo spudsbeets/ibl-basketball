@@ -1,3 +1,4 @@
+from helper_functions import generate_random_int
 from initial_templates import *
 
 class Team:
@@ -127,6 +128,93 @@ class Team:
             player.update_total_stats()
 
         self.update_individual_stats
+
+    # Broad effect of a coach on player ratings
+    def alter_offensive_player_ratings_by_coach(self):
+        if self.coach is None:
+            return
+        else:
+            for player in self.roster:
+                # Alter offensive ratings
+                if self.coach.coach_offense.rating > 0 and self.coach.coach_offense.rating <= 40:
+                    player.o_reb.curr_rating = max(0, player.o_reb.curr_rating - generate_random_int(0, 5))
+                    player.finishing.curr_rating = max(0, player.finishing.curr_rating - generate_random_int(0, 5))
+                    player.open_mid.curr_rating = max(0, player.open_mid.curr_rating - generate_random_int(0, 5))
+                    player.open_3.curr_rating = max(0, player.open_3.curr_rating - generate_random_int(0, 5))
+                    player.contest_mid.curr_rating = max(0, player.contest_mid.curr_rating - generate_random_int(0, 5))
+                    player.playmaking.curr_rating = max(0, player.playmaking.curr_rating - generate_random_int(0, 5))
+                    player.ft_shoot.curr_rating = max(0, player.ft_shoot.curr_rating - generate_random_int(0, 5))
+                elif self.coach.coach_offense.rating > 40 and self.coach.coach_offense.rating <= 70:
+                    o_reb_change = generate_random_int(-2, 2)
+                    player.o_reb.curr_rating = max(0, min(99, player.o_reb.curr_rating + o_reb_change))
+                    finishing_change = generate_random_int(-2, 2)
+                    player.finishing.curr_rating = max(0, min(99, player.finishing.curr_rating + finishing_change))
+                    open_mid_change = generate_random_int(-2, 2)
+                    player.open_mid.curr_rating = max(0, min(99, player.open_mid.curr_rating + open_mid_change))
+                    open_3_change = generate_random_int(-2, 2)
+                    player.open_3.curr_rating = max(0, min(99, player.open_3.curr_rating + open_3_change))
+                    contest_mid_change = generate_random_int(-2, 2)
+                    player.contest_mid.curr_rating = max(0, min(99, player.contest_mid.curr_rating + contest_mid_change))
+                    playmaking_change = generate_random_int(-2, 2)
+                    player.playmaking.curr_rating = max(0, min(99, player.playmaking.curr_rating + playmaking_change))
+                    ft_shoot_change = generate_random_int(-2, 2)
+                    player.ft_shoot.curr_rating = max(0, min(99, player.ft_shoot.curr_rating + ft_shoot_change))
+                else:
+                    player.o_reb.curr_rating = min(99, player.o_reb.curr_rating + generate_random_int(0, 5))
+                    player.finishing.curr_rating = min(99, player.finishing.curr_rating + generate_random_int(0, 5))
+                    player.open_mid.curr_rating = min(99, player.open_mid.curr_rating + generate_random_int(0, 5))
+                    player.open_3.curr_rating = min(99, player.open_3.curr_rating + generate_random_int(0, 5))
+                    player.contest_mid.curr_rating = min(99, player.contest_mid.curr_rating + generate_random_int(0, 5))
+                    player.playmaking.curr_rating = min(99, player.playmaking.curr_rating + generate_random_int(0, 5))
+                    player.ft_shoot.curr_rating = min(99, player.ft_shoot.curr_rating + generate_random_int(0, 5))
+
+    def alter_defensive_player_ratings_by_coach(self):
+        if self.coach is None:
+            return
+        else:
+            for player in self.roster:
+                # Alter offensive ratings
+                if self.coach.coach_defense.rating > 0 and self.coach.coach_defense.rating <= 40:
+                    player.d_reb.curr_rating = max(0, player.d_reb.curr_rating - generate_random_int(0, 5))
+                    player.block.curr_rating = max(0, player.block.curr_rating - generate_random_int(0, 5))
+                    player.steal.curr_rating = max(0, player.steal.curr_rating - generate_random_int(0, 5))
+                    player.stickiness.curr_rating = max(0, player.stickiness.curr_rating - generate_random_int(0, 5))
+                elif self.coach.coach_defense.rating > 40 and self.coach.coach_defense.rating <= 70:
+                    d_reb_change = generate_random_int(-2, 2)
+                    player.d_reb.curr_rating = max(0, min(99, player.d_reb.curr_rating + d_reb_change))
+                    block_change = generate_random_int(-2, 2)
+                    player.block.curr_rating = max(0, min(99, player.block.curr_rating + block_change))
+                    steal_change = generate_random_int(-2, 2)
+                    player.steal.curr_rating = max(0, min(99, player.steal.curr_rating + steal_change))
+                    stickiness_change = generate_random_int(-2, 2)
+                    player.stickiness.curr_rating = max(0, min(99, player.stickiness.curr_rating + stickiness_change))
+                else:
+                    player.d_reb.curr_rating = min(99, player.d_reb.curr_rating + generate_random_int(0, 5))
+                    player.block.curr_rating = min(99, player.block.curr_rating + generate_random_int(0, 5))
+                    player.steal.curr_rating = min(99, player.steal.curr_rating + generate_random_int(0, 5))
+                    player.stickiness.curr_rating = min(99, player.stickiness.curr_rating + generate_random_int(0, 5))
+
+    def alter_intangible_player_ratings_by_coach(self):
+        if self.coach is None:
+            return
+        else:
+            for player in self.roster:
+                # Alter offensive ratings
+                if self.coach.coach_intangibles.rating > 0 and self.coach.coach_intangibles.rating <= 40:
+                    player.awareness.curr_rating = max(0, player.awareness.curr_rating - generate_random_int(0, 5))
+                    player.endurance.curr_rating = max(0, player.endurance.curr_rating - generate_random_int(0, 5))
+                    player.confidence.curr_rating = max(0, player.confidence.curr_rating - generate_random_int(0, 5))
+                elif self.coach.coach_intangibles.rating > 40 and self.coach.coach_intangibles.rating <= 70:
+                    awareness_change = generate_random_int(-2, 2)
+                    player.awareness.curr_rating = max(0, min(99, player.awareness.curr_rating + awareness_change))
+                    endurance_change = generate_random_int(-2, 2)
+                    player.endurance.curr_rating = max(0, min(99, player.endurance.curr_rating + endurance_change))
+                    confidence_change = generate_random_int(-2, 2)
+                    player.confidence.curr_rating = max(0, min(99, player.confidence.curr_rating + confidence_change))
+                else:
+                    player.awareness.curr_rating = min(99, player.awareness.curr_rating + generate_random_int(0, 5))
+                    player.endurance.curr_rating = min(99, player.endurance.curr_rating + generate_random_int(0, 5))
+                    player.confidence.curr_rating = min(99, player.confidence.curr_rating + generate_random_int(0, 5))
 
     def goto_next_season(self):
         # Log stats into archive
