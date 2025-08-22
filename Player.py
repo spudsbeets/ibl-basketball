@@ -48,7 +48,7 @@ class Player:
         self.speed = speed
         self.strength = strength
         # Archetype for decision-making tree
-        self.offensive_archetype = self._determine_offensive_archetype
+        self.offensive_archetype = self._determine_offensive_archetype()
 
         # Calculations within class for Overall ratings
         self.o_ovr = self._calculate_o_overall()

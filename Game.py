@@ -354,7 +354,7 @@ class Game():
 
         # Determine attempted play
         play_type = self._determine_play_type(primary_playmaker, primary_defender)
-        print(play_type, primary_playmaker.name, primary_playmaker.position, primary_defender.name, primary_defender.position)
+        print(play_type, primary_playmaker.name, primary_playmaker.position, primary_playmaker.offensive_archetype, primary_defender.name, primary_defender.position)
         # Determine outcome
 
         # Update game and individual stats (if necessary)
