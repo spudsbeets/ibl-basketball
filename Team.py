@@ -19,6 +19,9 @@ class Team:
         self.starters = starters if starters is not None else {}
         self.bench = bench if bench is not None else []
         self.scouts = scouts if scouts is not None else []
+        # In game trackers
+        self.timeouts = 5
+        self.points = 0
         # Stats and Accolades
         self.accolades = accolades if accolades is not None else {'2030': None}
         self.wins = 0,
