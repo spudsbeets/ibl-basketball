@@ -47,6 +47,8 @@ class Player:
         # Raw athleticism ratings
         self.speed = speed
         self.strength = strength
+        # Archetype for decision-making tree
+        self.offensive_archetype = self._determine_offensive_archetype
 
         # Calculations within class for Overall ratings
         self.o_ovr = self._calculate_o_overall()
@@ -108,6 +110,32 @@ class Player:
     def _calculate_amateur_stats(self):
         amateur_stats = individual_stat_block_overalls
         return amateur_stats
+
+    def _determine_offensive_archetype(self):
+        # Return one of these strings
+        # 'offensive_beast' --> Good at everything
+        # 'creates_jumpers' --> High shooting
+        # 'creates_drives' --> High finishing
+        # 'creates_for_teammates' --> High playmaking/awareness
+        # 'offensive_dud' --> Bad at everything
+
+        threshold = 65
+        if self.confidence.curr_rating > 50:
+            threshold -= 10
+        if self.confidence.curr_rating > 90:
+            threshold -= 15
+
+        if self.playmaking.curr_rating > threshold and self.awareness.curr_rating > threshold and self.contest_3.curr_rating > threshold and \
+                self.contest_mid.curr_rating > threshold and self.finishing.curr_rating > threshold:
+            return 'offensive_beast'
+        elif self.contest_3.curr_rating > threshold and self.contest_mid.curr_rating > threshold:
+            return 'creates_jumpers'
+        elif self.finishing.curr_rating > threshold:
+            return 'creates_drives'
+        elif self.playmaking.curr_rating > threshold and self.awareness.curr_rating > threshold:
+            return 'creates_for_teammates'
+        else:
+            return 'offensive_dud'
 
     # Public Methods
     def set_salary(self, new_num):

@@ -11,7 +11,7 @@ generate_entry_draft_class()
 
 # Optional print statement to see draft class and ratings. Comment out if desired.
 # Sort pool
-#sorted_player_pool = get_sorted_players()
+#sorted_player_pool = get_sorted_players(prospect_pool)
 #for player in sorted_player_pool:
 #    print({
 #        'name': player.name,

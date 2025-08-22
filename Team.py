@@ -22,6 +22,7 @@ class Team:
         # In game trackers
         self.timeouts = 5
         self.points = 0
+        self.fouls_in_q = 0
         # Stats and Accolades
         self.accolades = accolades if accolades is not None else {'2030': None}
         self.wins = 0,
@@ -96,7 +97,7 @@ class Team:
 
     def set_starters(self):
         used_positions = set()
-        for player in get_sorted_team_roster(self.roster):
+        for player in get_sorted_players(self.roster):
             if player.position not in used_positions:
                 self.starters[player.position] = player
                 used_positions.add(player.position)

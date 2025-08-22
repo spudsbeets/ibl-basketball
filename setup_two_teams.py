@@ -7,7 +7,7 @@ def has_position(team, position):
 
 # Finds best available player then removes them from prospect pool
 def find_and_draft_best_player_by_pos(pool, positions):
-    sorted_pool = get_sorted_players()
+    sorted_pool = get_sorted_players(pool)
     for player in sorted_pool:
         if player.position in positions:
             for i, p in enumerate(pool):
