@@ -115,7 +115,8 @@ class Player:
         # Return one of these strings
         # 'offensive_beast' --> Good at everything
         # 'creates_jumpers' --> High shooting
-        # 'creates_drives' --> High finishing
+        # 'creates_drives' --> High finishing guards and SF
+        # 'post_merchant' --> High finishing PF and C
         # 'creates_for_teammates' --> High playmaking/awareness
         # 'offensive_dud' --> Bad at everything
 
@@ -130,10 +131,12 @@ class Player:
             return 'offensive_beast'
         elif self.contest_3.curr_rating > threshold and self.contest_mid.curr_rating > threshold:
             return 'creates_jumpers'
-        elif self.finishing.curr_rating > threshold:
-            return 'creates_drives'
         elif self.playmaking.curr_rating > threshold and self.awareness.curr_rating > threshold:
             return 'creates_for_teammates'
+        elif self.finishing.curr_rating > threshold and self.position in ('PG', 'SG', 'SF'):
+            return 'creates_drives'
+        elif self.finishing.curr_rating > threshold and self.position in ('PF', 'C'):
+            return 'post_merchant'
         else:
             return 'offensive_dud'
 

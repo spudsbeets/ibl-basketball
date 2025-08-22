@@ -226,6 +226,7 @@ class Game():
         # 'create_3'
         # 'create_mid'
         # 'iso_drive'
+        # 'post_up'
         # 'pick_n_roll' --> secondary POTENTIALLY needed
         # 'drive_n_pass' --> secondary needed
         # 'find_cutter' --> secondary needed
@@ -235,8 +236,9 @@ class Game():
             probabilities = {
                 'create_3': 15, # 15% chance
                 'create_mid': 30, # 15% chance
-                'iso_drive': 50, # 20% chance
-                'pick_n_roll': 70, # 20% chance
+                'iso_drive': 45, # 15% chance
+                'post_up': 55, # 10% chance
+                'pick_n_roll': 70, # 15% chance
                 'drive_n_pass': 85, # 15% chance
                 'find_cutter': 100 # 15% chance
             }
@@ -245,7 +247,8 @@ class Game():
                 'create_3': 25, # 25% chance
                 'create_mid': 50, # 25% chance
                 'iso_drive': 65, # 15% chance
-                'pick_n_roll': 80, # 15% chance
+                'post_up': 70, #5% chance
+                'pick_n_roll': 80, # 10% chance
                 'drive_n_pass': 90, # 10% chance
                 'find_cutter': 100 # 10% chance
             }
@@ -253,9 +256,20 @@ class Game():
             probabilities = {
                 'create_3': 10, # 10% chance
                 'create_mid': 20, # 10% chance
-                'iso_drive': 50, # 30% chance
-                'pick_n_roll': 65, # 15% chance
-                'drive_n_pass': 85, # 20% chance
+                'iso_drive': 45, # 25% chance
+                'post_up': 60, #10% chance
+                'pick_n_roll': 70, # 15% chance
+                'drive_n_pass': 85, # 15% chance
+                'find_cutter': 100 # 15% chance
+            }
+        elif primary_playmaker.offensive_archetype == 'post_merchant':
+            probabilities = {
+                'create_3': 5, # 5% chance
+                'create_mid': 15, # 10% chance
+                'iso_drive': 30, # 15% chance
+                'post_up': 60, #30% chance
+                'pick_n_roll': 70, # 10% chance
+                'drive_n_pass': 85, # 15% chance
                 'find_cutter': 100 # 15% chance
             }
         # 'creates_for_teammates'
@@ -264,9 +278,10 @@ class Game():
                 'create_3': 10, # 10% chance
                 'create_mid': 20, # 10% chance
                 'iso_drive': 30, # 10% chance
-                'pick_n_roll': 55, # 25% chance
-                'drive_n_pass': 75, # 20% chance
-                'find_cutter': 100 # 25% chance
+                'post_up': 40, # 10% chance
+                'pick_n_roll': 60, # 20% chance
+                'drive_n_pass': 80, # 20% chance
+                'find_cutter': 100 # 20% chance
             }
 
         # Prioritize getting ball out of hands if defender is awesome
@@ -274,6 +289,7 @@ class Game():
             probabilities['create_3'] -= 5
             probabilities['create_mid'] -= 10
             probabilities['iso_drive'] -= 15
+            probabilities['post_up'] -= 15
             probabilities['pick_n_roll'] -= 10
             probabilities['drive_n_pass'] -= 5
 
@@ -285,6 +301,8 @@ class Game():
             return 'create_mid'
         elif randomNum <= probabilities['iso_drive']:
             return 'iso_drive'
+        elif randomNum <= probabilities['post_up']:
+            return 'post_up'
         elif randomNum <= probabilities['pick_n_roll']:
             return 'pick_n_roll'
         elif randomNum <= probabilities['drive_n_pass']:
