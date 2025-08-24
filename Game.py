@@ -74,11 +74,30 @@ class Game():
         else:
             print('Error! Unknown stoppage type.')
 
-    def _increase_stamina_bench(self):
-        print('increasing resters stamina!')
+    def _increase_stamina_bench(self, home_bench, away_bench):
+        for player in home_bench:
+            player.stamina += min(99, generate_random_int(2, 4))
+        for player in away_bench:
+            player.stamina += min(99, generate_random_int(2, 4))
 
-    def _decrease_stamina_onCourt(self, primary_playmaker, primary_defender, secondary_playmaker, secondary_defender):
-        print('dropping players stamina!')
+    def _decrease_stamina_onCourt(self, primary_playmaker, primary_defender, secondary_playmaker, secondary_defender,
+                                  offense_on_court, defense_on_court):
+        offense_on_court_replica = offense_on_court
+        defense_on_court_replica = defense_on_court
+        primary_playmaker.stamina -= generate_random_int(5, 8)
+        primary_defender.stamina -= generate_random_int(5, 8)
+        offense_on_court_replica.remove(primary_playmaker)
+        defense_on_court_replica.remove(primary_defender)
+        if secondary_playmaker:
+            secondary_playmaker.stamina -= generate_random_int(4, 7)
+            secondary_defender.stamina -= generate_random_int(4, 7)
+            offense_on_court_replica.remove(secondary_playmaker)
+            defense_on_court_replica.remove(secondary_defender)
+        for player in offense_on_court:
+            player.stamina -= generate_random_int(2, 5)
+        for player in defense_on_court:
+            player.stamina -= generate_random_int(2, 5)
+
 
     def _reset_stamina(self):
         for player in self.home_team.roster:
@@ -310,7 +329,9 @@ class Game():
         else:
             return 'find_cutter'
 
-    def _simulate_play(self):
+    def _determine_play_outcome(self, primary_playmaker, primary_defender, play_type,
+                                offense_team, defense_team, offense_on_court, defense_on_court,
+                                offense_on_bench, defense_on_bench):
         # POSSIBLE OUTCOMES
         # (Make or miss) (self-created or pass-created) (open or contested) shot (layup, dunk, 2, or 3)
         # Defensive foul (ft's or OB --> Bonus @ foul #5)
@@ -320,11 +341,79 @@ class Game():
         # Stolen ball (possession change)
         # Offensive foul (OB --> possession change)
         # Defensive rebound off miss (possession change)
-        # Potential for fast break bucket (off turnover, low chance off d-reb)
 
+        # Add Potential for fast break bucket (off turnover, low chance off d-reb) later...
         # Add injury possibility later...
 
-        # FLOW
+        # SETUP
+        if self.curr_poss == 'home_team':
+            offense = 'home_team'
+            defense = 'away_team'
+        else:
+            offense = 'away_team'
+            defense = 'home_team'
+
+        stoppage = False
+        stoppage_type = None
+
+        if play_type == 'create_3':
+        # OFFENSIVE RATINGS AT PLAY:
+        # PRIMARY --> Playmaking (ability to get open) -> Open 3 or Contested 3,
+        # ALL --> Miss -> Offensive Rebound
+        # DEFENSIVE RATINGS AT PLAY:
+        # PRIMARY --> Stickiness (ability to prevent getting open), Steal (poke the ball out), Block (if shot gets off)
+        # ALL --> Miss -> Defensive Rebound
+        # POSSIBILITY TREE --> 1) Determine Steal or reach-in foul, 2) Determine Open or Contested,
+        # 3) Determine Block, Shooting Foul, Make, or Miss (contested only for block/foul),
+        # 4) Off miss, determine Offensive Rebound, Defensive Rebound, Off-ball foul, or Swat OB,
+        # 5) Update stats, points, possession, stamina, substitutes where necessary
+            stealSuccess = generate_random_int(0, 100)
+            # MODIFIERS
+
+            # Base 6% chance make contact w/ball
+            if stealSuccess > 94:
+                stealOB = generate_random_int(0, 100)
+                # Base 30% chance steal attempt goes OB
+                if stealOB > 30:
+                    primary_defender.game_stats['steals'] += 1
+                    primary_playmaker.game_stats['turnovers'] += 1
+                    self.game_stat_block[self.curr_quarter][defense]['steals'] += 1
+                    self.game_stat_block[self.curr_quarter][offense]['turnovers'] += 1
+                    print(f"Ball stolen from {primary_playmaker.name} by {primary_defender.name}.")
+                else:
+                    stoppage = True
+                    stoppage_type = 'OB'
+                    print(f"Ball knocked out of bounds by {primary_defender.name} from {primary_playmaker.name}.")
+
+            # Base 8% chance reach-in foul
+            elif stealSuccess < 8:
+                stoppage = True
+                print(f"Reach-in foul committed by {primary_defender.name} on {primary_playmaker.name}.")
+
+            # Stamina Change
+            self._decrease_stamina_onCourt(primary_playmaker, primary_defender, None, None,
+                                           offense_on_court, defense_on_court)
+            if not stoppage:
+                self._increase_stamina_bench(offense_on_bench, defense_on_bench)
+            else:
+                self._increase_stamina_all(stoppage_type)
+                self._check_for_subs()
+
+
+        elif play_type == 'create_mid':
+            print('create_mid')
+        elif play_type == 'iso_drive':
+            print('iso_drive')
+        elif play_type == 'post_up':
+            print('post_up')
+        elif play_type == 'pick_n_roll':
+            print('pick_n_roll')
+        elif play_type == 'drive_n_pass':
+            print('drive_n_pass')
+        else:
+            print('find_cutter')
+
+    def _simulate_play(self):
         # SETUP
 
         # Default all defensive schemes to man, will be more involved later on
@@ -335,11 +424,15 @@ class Game():
             defense_team = self.away_team
             offense_on_court = self.home_onCourt
             defense_on_court = self.away_onCourt
+            offense_on_bench = self.home_onBench
+            defense_on_bench = self.away_onBench
         else:
             offense_team = self.away_team
             defense_team = self.home_team
             offense_on_court = self.away_onCourt
             defense_on_court = self.home_onCourt
+            offense_on_bench = self.away_onBench
+            defense_on_bench = self.home_onBench
 
         # Team can choose to take timeout
         if self._check_for_timeout(offense_on_court, offense_team, defense_team):
@@ -354,17 +447,11 @@ class Game():
 
         # Determine attempted play
         play_type = self._determine_play_type(primary_playmaker, primary_defender)
-        print(play_type, primary_playmaker.name, primary_playmaker.position, primary_playmaker.offensive_archetype, primary_defender.name, primary_defender.position)
-        # Determine outcome
 
-        # Update game and individual stats (if necessary)
-
-        # Update stamina for bench and onCourt
-        # (big boost for all on timeout, slightly bigger drop for primary defender(s)/playmaker(s))
-
-        # Update possession tracker (if necessary)
-
-        # If play caused a stoppage (OB, foul, timeout), allow opportunity for substitutions
+        # Determine outcome, update possession (if necessary), update stamina, on stoppage --> allow subs,
+        # update stats and points (if necessary)
+        self._determine_play_outcome(primary_playmaker, primary_defender, play_type, offense_team, defense_team,
+                                     offense_on_court, defense_on_court, offense_on_bench, defense_on_bench)
 
     # Public Methods
     def simulate_game(self):
