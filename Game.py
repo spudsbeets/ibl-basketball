@@ -1,6 +1,7 @@
 from get_sorted_pools import *
 from initial_templates import *
 from helper_functions import *
+import math
 
 class Game():
     def __init__(self, home_team, away_team,
@@ -82,21 +83,15 @@ class Game():
 
     def _decrease_stamina_onCourt(self, primary_playmaker, primary_defender, secondary_playmaker, secondary_defender,
                                   offense_on_court, defense_on_court):
-        offense_on_court_replica = offense_on_court
-        defense_on_court_replica = defense_on_court
-        primary_playmaker.stamina -= generate_random_int(5, 8)
-        primary_defender.stamina -= generate_random_int(5, 8)
-        offense_on_court_replica.remove(primary_playmaker)
-        defense_on_court_replica.remove(primary_defender)
-        if secondary_playmaker:
-            secondary_playmaker.stamina -= generate_random_int(4, 7)
-            secondary_defender.stamina -= generate_random_int(4, 7)
-            offense_on_court_replica.remove(secondary_playmaker)
-            defense_on_court_replica.remove(secondary_defender)
-        for player in offense_on_court:
-            player.stamina -= generate_random_int(2, 5)
-        for player in defense_on_court:
-            player.stamina -= generate_random_int(2, 5)
+        teams_on_court = [offense_on_court, defense_on_court]
+        for team in teams_on_court:
+            for player in team:
+                if player == primary_playmaker or player == primary_defender:
+                    player.stamina -= generate_random_int(5, 8)
+                elif player == secondary_playmaker or player == secondary_defender:
+                    player.stamina -= generate_random_int(4, 7)
+                else:
+                    player.stamina -= generate_random_int(2, 5)
 
 
     def _reset_stamina(self):
@@ -111,7 +106,70 @@ class Game():
         for player in self.away_onCourt:
             player.game_stats['plays'] += 1
 
+    def _non_binary_adjust_thresholds(self, rating, threshold_dict, max_change, d_or_o):
+        # Take a rating, threshold_dict (lo and hi vals), the maximum possible manipulation, and
+        # 'defense' or 'offense'. Randomly manipulates possibilites of certain events.
+        distance = abs(rating - 50) / 50
+        raw_adjust = random.uniform(1, max_change) * distance
+        adjustment = math.ceil(raw_adjust)
+        rating_thresh = generate_random_int(40, 60)
+
+        if rating < rating_thresh:
+            if d_or_o == 'defense':
+                threshold_dict['lo'] += adjustment
+                threshold_dict['hi'] += adjustment
+            else:
+                threshold_dict['lo'] -= adjustment
+                threshold_dict['hi'] -= adjustment
+        elif rating > rating_thresh:
+            if d_or_o == 'defense':
+                threshold_dict['lo'] -= adjustment
+                threshold_dict['hi'] -= adjustment
+            else:
+                threshold_dict['lo'] += adjustment
+                threshold_dict['hi'] += adjustment
+
+        # Clamp to [0, 99]
+        threshold_dict['lo'] = max(0, min(99, threshold_dict['lo']))
+        threshold_dict['hi'] = max(0, min(99, threshold_dict['hi']))
+
+        # Ensure lo never exceeds hi
+        if threshold_dict['lo'] > threshold_dict['hi']:
+            threshold_dict['lo'] = threshold_dict['hi']
+
+    def _binary_adjust_threshold(self, rating, threshold, max_change, d_or_o):
+        # Same as above but for binary situations, i.e. made or missed shot
+        distance = abs(rating - 50) / 50
+        raw_adjust = random.uniform(1, max_change) * distance
+        adjustment = math.ceil(raw_adjust)
+        rating_thresh = random.randint(40, 60)
+
+        if rating < rating_thresh:
+            if d_or_o == 'defense':
+                threshold += adjustment
+            else:
+                threshold -= adjustment
+        elif rating > rating_thresh:
+            if d_or_o == 'defense':
+                threshold -= adjustment
+            else:
+                threshold += adjustment
+
+        threshold = max(0, min(99, threshold))
+        return threshold
+
+    def _log_fouls_and_points_by_q(self, home_team, away_team, stat_block, curr_quarter):
+        stat_block[curr_quarter][home_team]['fouls'] += home_team.fouls_in_q
+        stat_block[curr_quarter][away_team]['fouls'] += away_team.fouls_in_q
+        stat_block[curr_quarter][home_team]['points'] += home_team.points
+        stat_block[curr_quarter][away_team]['points'] += away_team.points
+        home_team.fouls_in_q = 0
+        away_team.fouls_in_q = 0
+        home_team.points_in_q = 0
+        away_team.points_in_q = 0
+
     def _check_for_subs(self):
+        # Add in foul considerations here at some point.
         for court_player in self.home_onCourt[:]:
             if court_player.stamina < 30 or court_player not in self.home_team.starters:
                 cp_position = 'guard' if court_player.position in ('PG', 'SG') else 'forward'
@@ -342,8 +400,12 @@ class Game():
         # Offensive foul (OB --> possession change)
         # Defensive rebound off miss (possession change)
 
+        # GREATER VALUES --> Good for defense
+        # LESSER VALUES --> Good for offense
+
         # Add Potential for fast break bucket (off turnover, low chance off d-reb) later...
         # Add injury possibility later...
+        # Add foul out logic later
 
         # SETUP
         if self.curr_poss == 'home_team':
@@ -355,6 +417,7 @@ class Game():
 
         stoppage = False
         stoppage_type = None
+        poss_change = False
 
         if play_type == 'create_3':
         # OFFENSIVE RATINGS AT PLAY:
@@ -367,38 +430,104 @@ class Game():
         # 3) Determine Block, Shooting Foul, Make, or Miss (contested only for block/foul),
         # 4) Off miss, determine Offensive Rebound, Defensive Rebound, Off-ball foul, or Swat OB,
         # 5) Update stats, points, possession, stamina, substitutes where necessary
-            stealSuccess = generate_random_int(0, 100)
+            # Determine (1)
+            # Low result = reach-in foul, High result = steal
+            steal_threshold = {'lo': generate_random_int(5, 8), 'hi': generate_random_int(91, 95)}
+            steal_success = generate_random_int(0, 100)
             # MODIFIERS
-
+            self._non_binary_adjust_thresholds(primary_defender.steal.curr_rating, steal_threshold, 6, 'defense')
+            self._non_binary_adjust_thresholds(primary_playmaker.awareness.curr_rating, steal_threshold, 6, 'offense')
             # Base 6% chance make contact w/ball
-            if stealSuccess > 94:
-                stealOB = generate_random_int(0, 100)
+            if steal_success > steal_threshold['hi']:
+                steal_OB = generate_random_int(0, 100)
                 # Base 30% chance steal attempt goes OB
-                if stealOB > 30:
+                if steal_OB > 30:
                     primary_defender.game_stats['steals'] += 1
                     primary_playmaker.game_stats['turnovers'] += 1
                     self.game_stat_block[self.curr_quarter][defense]['steals'] += 1
                     self.game_stat_block[self.curr_quarter][offense]['turnovers'] += 1
+                    poss_change = True
                     print(f"Ball stolen from {primary_playmaker.name} by {primary_defender.name}.")
                 else:
                     stoppage = True
                     stoppage_type = 'OB'
                     print(f"Ball knocked out of bounds by {primary_defender.name} from {primary_playmaker.name}.")
 
-            # Base 8% chance reach-in foul
-            elif stealSuccess < 8:
+            # Base 6% chance reach-in foul
+            elif steal_success < steal_threshold['lo']:
                 stoppage = True
+                primary_defender.game_stats['fouls'] += 1
+                defense_team.fouls_in_q += 1
                 print(f"Reach-in foul committed by {primary_defender.name} on {primary_playmaker.name}.")
+                # If offense is in the bonus take FTS
+                if defense_team.fouls_in_q > 4 or (defense_team.fouls_in_q > 1 and self.curr_quarter == 'OT'):
+                    # Low Result = Make, High result = Miss
+                    initial_ft_threshold = generate_random_int(55, 80)
+                    # MODIFIERS
+                    ft_threshold = self._binary_adjust_threshold(primary_playmaker.ft_shoot.curr_rating, initial_ft_threshold, 25, 'offense')
+                    made_count = 0
+                    for _ in range(2):
+                        ft_success = generate_random_int(0, 100)
+                        if ft_success < ft_threshold:
+                            made_count += 1
+                    primary_playmaker.game_stats['ft_taken'] += 2
+                    primary_playmaker.game_stats['ft_made'] += made_count
+                    primary_playmaker.game_stats['points'] += made_count
+                    self.game_stat_block[self.curr_quarter][offense]['ft_taken'] += 2
+                    self.game_stat_block[self.curr_quarter][offense]['ft_made'] += made_count
+                    offense_team.points_in_q += made_count
+                    stoppage_type = 'fts'
+                    poss_change = True
+                    print(f"Free throws awarded to {primary_playmaker.name}. {primary_playmaker.name} makes {made_count} / 2 fts.")
+                else:
+                    stoppage_type = 'OB'
+                    print(f"Ball taken out of bounds by {offense_team.nickname}.")
 
-            # Stamina Change
+            # Determine (2)
+            # Low result = Gets open, High result = Contested shot
+            initial_open_threshold = generate_random_int(35, 51)
+            # MODIFIERS
+            offense_mod_open_threshold = self._binary_adjust_threshold(primary_playmaker.playmaking.curr_rating, initial_open_threshold, 8, 'offense')
+            open_threshold = self._binary_adjust_threshold(primary_defender.stickiness.curr_rating, offense_mod_open_threshold, 8, 'defense')
+            # Success roll
+            open_success = generate_random_int(0, 100)
+            if open_success < open_threshold:
+                # Determine (3)
+                # Low result = Make, High result = Miss
+                initial_open_3_threshold = generate_random_int(32, 44)
+                # MODIFIERS
+                open_3_threshold = self._binary_adjust_threshold(primary_playmaker.open_3.curr_rating, initial_open_3_threshold, 12, 'offense')
+                # Success roll
+                open_3_success = generate_random_int(0, 100)
+                # If made
+                if open_3_success < open_3_threshold:
+                    primary_playmaker.game_stats['3fg_taken'] += 1
+                    primary_playmaker.game_stats['3fg_made'] += 1
+                    primary_playmaker.game_stats['points'] += 3
+                    self.game_stat_block[self.curr_quarter][offense]['3fg_taken'] += 1
+                    self.game_stat_block[self.curr_quarter][offense]['3fg_made'] += 1
+                    offense_team.points_in_q += 3
+                    poss_change = True
+                    print(f"{primary_playmaker.name} made 3 point basket.")
+                # If missed
+                # Determine (4)
+                else:
+                    print(f"{primary_playmaker.name} missed 3 point basket.")
+            else:
+                print('contested 3')
+
+
+            # Happens after any result
             self._decrease_stamina_onCourt(primary_playmaker, primary_defender, None, None,
                                            offense_on_court, defense_on_court)
+            self._update_play_counts()
+            if poss_change:
+                self.curr_poss = defense
             if not stoppage:
                 self._increase_stamina_bench(offense_on_bench, defense_on_bench)
             else:
                 self._increase_stamina_all(stoppage_type)
                 self._check_for_subs()
-
 
         elif play_type == 'create_mid':
             print('create_mid')
@@ -462,52 +591,51 @@ class Game():
         for _ in range(self.q1_plays):
             self._simulate_play()
         print('END Q1')
+        # Log stats, reset trackers
+        self._log_fouls_and_points_by_q(self.home_team, self.away_team, self.game_stat_block, self.curr_quarter)
         # Simulate Q2
-        self.home_team.fouls_in_q = 0
-        self.away_team.fouls_in_q = 0
         self.curr_quarter = 2
         for _ in range(self.q2_plays):
             self._simulate_play()
         print('END Q2')
-        # Simulate Q3 (re-insert starters, reset stamina)
+        # Re-insert starters, reset stamina
         self._reset_stamina()
         self._set_onCourt()
-        self.home_team.fouls_in_q = 0
-        self.away_team.fouls_in_q = 0
+        # Log stats, reset trackers
+        self._log_fouls_and_points_by_q(self.home_team, self.away_team, self.game_stat_block, self.curr_quarter)
+        # Simulate Q3
         self.curr_quarter = 3
         for _ in range(self.q3_plays):
             self._simulate_play()
         print('END Q3')
+        self._log_fouls_and_points_by_q(self.home_team, self.away_team, self.game_stat_block, self.curr_quarter)
         # Simulate Q4
-        self.home_team.fouls_in_q = 0
-        self.away_team.fouls_in_q = 0
         self.curr_quarter = 4
         for _ in range(self.q4_plays):
             self._simulate_play()
         print('END Q4')
-        # If OT is needed COMMENT OUT ONCE POINT TRACKING IS ADDED IN
-        # self.home_team.fouls_in_q = 0
-        # self.away_team.fouls_in_q = 0
+        self._log_fouls_and_points_by_q(self.home_team, self.away_team, self.game_stat_block, self.curr_quarter)
+        # Simulate OT if needed
         # Two timeouts awarded to each team for OT periods
-        # self.home_team.timeouts = 2
-        # self.away_team.timeouts = 2
-        # self.curr_quarter = 'OT'
-        # while self.home_team.points == self.away_team.points:
-        #    self.OT_plays_current += generate_random_int(13, 20)
-        #    self.OT_plays_total += self.OT_plays_current
-        #    for _ in range (self.OT_plays_current):
-        #        self._simulate_play()
-        #    self.home_team.fouls_in_q = 0
-        #    self.away_team.fouls_in_q = 0
-        #    self.OT_plays_current = 0
+        self.home_team.timeouts = 2
+        self.away_team.timeouts = 2
+        self.curr_quarter = 'OT'
+        while self.home_team.points_total == self.away_team.points_total:
+            self.OT_plays_current += generate_random_int(13, 20)
+            self.OT_plays_total += self.OT_plays_current
+            for _ in range (self.OT_plays_current):
+                self._simulate_play()
+            self.home_team.fouls_in_q = 0
+            self.away_team.fouls_in_q = 0
+            self.OT_plays_current = 0
+        print('END GAME')
+        self._log_fouls_and_points_by_q(self.home_team, self.away_team, self.game_stat_block, self.curr_quarter)
         # Log player stats and game stats
 
-        # Reset starters and stamina for next game
+        # Reset starters, stamina, and trackers for next game
         self._reset_stamina()
         self._set_onCourt()
-        self.home_team.points = 0
-        self.away_team.points = 0
+        self.home_team.points_total = 0
+        self.away_team.points_total = 0
         self.home_team.timeouts = 5
         self.away_team.timeouts = 5
-        self.home_team.fouls_in_q = 0
-        self.away_team.fouls_in_q = 0

@@ -21,7 +21,8 @@ class Team:
         self.scouts = scouts if scouts is not None else []
         # In game trackers
         self.timeouts = 5
-        self.points = 0
+        self.points_in_q = 0
+        self.points_total = 0
         self.fouls_in_q = 0
         # Stats and Accolades
         self.accolades = accolades if accolades is not None else {'2030': None}

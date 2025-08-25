@@ -75,7 +75,7 @@ individual_stat_block_game = {
 
 game_stat_block = {
     'home_team': {
-        'points_scored': 0,
+        'points': 0,
         '2fg_taken': 0,
         '2fg_made': 0,
         '3fg_taken': 0,
@@ -92,7 +92,7 @@ game_stat_block = {
         'fouls': 0
     },
     'away_team': {
-        'points_scored': 0,
+        'points': 0,
         '2fg_taken': 0,
         '2fg_made': 0,
         '3fg_taken': 0,
