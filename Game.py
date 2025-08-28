@@ -106,6 +106,13 @@ class Game():
         for player in self.away_onCourt:
             player.game_stats['plays'] += 1
 
+    def _update_plus_minus(self, offense_on_court, defense_on_court, points_scored):
+        for player in offense_on_court:
+            player.game_stats['+/-'] += points_scored
+        for player in defense_on_court:
+            player.game_stats['+/-'] -= points_scored
+
+
     def _non_binary_adjust_thresholds(self, rating, threshold_dict, max_change, d_or_o):
         # Take a rating, threshold_dict (lo and hi vals), the maximum possible manipulation, and
         # 'defense' or 'offense'. Randomly manipulates possibilites of certain events.
@@ -159,10 +166,10 @@ class Game():
         return threshold
 
     def _log_fouls_and_points_by_q(self, home_team, away_team, stat_block, curr_quarter):
-        stat_block[curr_quarter][home_team]['fouls'] += home_team.fouls_in_q
-        stat_block[curr_quarter][away_team]['fouls'] += away_team.fouls_in_q
-        stat_block[curr_quarter][home_team]['points'] += home_team.points
-        stat_block[curr_quarter][away_team]['points'] += away_team.points
+        stat_block[curr_quarter]['home_team']['fouls'] += home_team.fouls_in_q
+        stat_block[curr_quarter]['away_team']['fouls'] += away_team.fouls_in_q
+        stat_block[curr_quarter]['home_team']['points'] += home_team.points_in_q
+        stat_block[curr_quarter]['away_team']['points'] += away_team.points_in_q
         home_team.fouls_in_q = 0
         away_team.fouls_in_q = 0
         home_team.points_in_q = 0
@@ -258,6 +265,38 @@ class Game():
             return sorted_offense[3]
         else:
             return sorted_offense[4]
+
+    def _determine_primary_offense_rebounder(self, offense_on_court):
+        sorted_offense = get_sorted_roster_by_o_reb(offense_on_court)
+
+        offense_random_num = generate_random_int(0, 100)
+
+        if offense_random_num < 40:
+            return sorted_offense[0]
+        elif offense_random_num < 70:
+            return sorted_offense[1]
+        elif offense_random_num < 90:
+            return sorted_offense[2]
+        elif offense_random_num < 95:
+            return sorted_offense[3]
+        else:
+            return sorted_offense[4]
+
+    def _determine_primary_defense_rebounder(self, defense_on_court):
+        sorted_defense = get_sorted_roster_by_d_reb(defense_on_court)
+
+        defense_random_num = generate_random_int(0, 100)
+
+        if defense_random_num < 40:
+            return sorted_defense[0]
+        elif defense_random_num < 70:
+            return sorted_defense[1]
+        elif defense_random_num < 90:
+            return sorted_defense[2]
+        elif defense_random_num < 95:
+            return sorted_defense[3]
+        else:
+            return sorted_defense[4]
 
     def _determine_matchups(self, offense_on_court, defense_on_court, defensive_scheme):
 
@@ -420,6 +459,7 @@ class Game():
         poss_change = False
 
         if play_type == 'create_3':
+            print('create_3')
         # OFFENSIVE RATINGS AT PLAY:
         # PRIMARY --> Playmaking (ability to get open) -> Open 3 or Contested 3,
         # ALL --> Miss -> Offensive Rebound
@@ -433,10 +473,11 @@ class Game():
             # Determine (1)
             # Low result = reach-in foul, High result = steal
             steal_threshold = {'lo': generate_random_int(5, 8), 'hi': generate_random_int(91, 95)}
-            steal_success = generate_random_int(0, 100)
             # MODIFIERS
             self._non_binary_adjust_thresholds(primary_defender.steal.curr_rating, steal_threshold, 6, 'defense')
             self._non_binary_adjust_thresholds(primary_playmaker.awareness.curr_rating, steal_threshold, 6, 'offense')
+            # Success Roll
+            steal_success = generate_random_int(0, 100)
             # Base 6% chance make contact w/ball
             if steal_success > steal_threshold['hi']:
                 steal_OB = generate_random_int(0, 100)
@@ -475,6 +516,7 @@ class Game():
                     primary_playmaker.game_stats['points'] += made_count
                     self.game_stat_block[self.curr_quarter][offense]['ft_taken'] += 2
                     self.game_stat_block[self.curr_quarter][offense]['ft_made'] += made_count
+                    self._update_plus_minus(offense_on_court, defense_on_court, made_count)
                     offense_team.points_in_q += made_count
                     stoppage_type = 'fts'
                     poss_change = True
@@ -485,37 +527,277 @@ class Game():
 
             # Determine (2)
             # Low result = Gets open, High result = Contested shot
-            initial_open_threshold = generate_random_int(35, 51)
-            # MODIFIERS
-            offense_mod_open_threshold = self._binary_adjust_threshold(primary_playmaker.playmaking.curr_rating, initial_open_threshold, 8, 'offense')
-            open_threshold = self._binary_adjust_threshold(primary_defender.stickiness.curr_rating, offense_mod_open_threshold, 8, 'defense')
-            # Success roll
-            open_success = generate_random_int(0, 100)
-            if open_success < open_threshold:
-                # Determine (3)
-                # Low result = Make, High result = Miss
-                initial_open_3_threshold = generate_random_int(32, 44)
-                # MODIFIERS
-                open_3_threshold = self._binary_adjust_threshold(primary_playmaker.open_3.curr_rating, initial_open_3_threshold, 12, 'offense')
-                # Success roll
-                open_3_success = generate_random_int(0, 100)
-                # If made
-                if open_3_success < open_3_threshold:
-                    primary_playmaker.game_stats['3fg_taken'] += 1
-                    primary_playmaker.game_stats['3fg_made'] += 1
-                    primary_playmaker.game_stats['points'] += 3
-                    self.game_stat_block[self.curr_quarter][offense]['3fg_taken'] += 1
-                    self.game_stat_block[self.curr_quarter][offense]['3fg_made'] += 1
-                    offense_team.points_in_q += 3
-                    poss_change = True
-                    print(f"{primary_playmaker.name} made 3 point basket.")
-                # If missed
-                # Determine (4)
-                else:
-                    print(f"{primary_playmaker.name} missed 3 point basket.")
             else:
-                print('contested 3')
-
+                initial_open_threshold = generate_random_int(35, 51)
+                # MODIFIERS
+                offense_mod_open_threshold = self._binary_adjust_threshold(primary_playmaker.playmaking.curr_rating, initial_open_threshold, 8, 'offense')
+                open_threshold = self._binary_adjust_threshold(primary_defender.stickiness.curr_rating, offense_mod_open_threshold, 8, 'defense')
+                # Success roll
+                open_success = generate_random_int(0, 100)
+                if open_success < open_threshold:
+                    # Determine (3)
+                    # Low result = Make, High result = Miss
+                    initial_open_3_threshold = generate_random_int(32, 44)
+                    # MODIFIERS
+                    open_3_threshold = self._binary_adjust_threshold(primary_playmaker.open_3.curr_rating, initial_open_3_threshold, 12, 'offense')
+                    # Success roll
+                    open_3_success = generate_random_int(0, 100)
+                    # If made
+                    if open_3_success < open_3_threshold:
+                        primary_playmaker.game_stats['3fg_taken'] += 1
+                        primary_playmaker.game_stats['3fg_made'] += 1
+                        primary_playmaker.game_stats['points'] += 3
+                        self.game_stat_block[self.curr_quarter][offense]['3fg_taken'] += 1
+                        self.game_stat_block[self.curr_quarter][offense]['3fg_made'] += 1
+                        offense_team.points_in_q += 3
+                        self._update_plus_minus(offense_on_court, defense_on_court, 3)
+                        poss_change = True
+                        print(f"{primary_playmaker.name} made open 3 point basket.")
+                    # If missed
+                    # Determine (4)
+                    else:
+                        print(f"{primary_playmaker.name} missed open 3 point basket.")
+                        # Low result = Swat OB (determine off whom), High result = Foul (determine on whom)
+                        swatOB_or_foul_threshold = {'lo': generate_random_int(6, 9), 'hi': generate_random_int(93, 96)}
+                        # NO MODIFIERS (random result)
+                        # Success Roll
+                        swatOB_or_foul_success = generate_random_int(0, 100)
+                        if swatOB_or_foul_success < swatOB_or_foul_threshold['lo']:
+                            team_OB_success = generate_random_int(0, 100)
+                            if team_OB_success < 50:
+                                team_OB = offense_team
+                                OB_player = offense_on_court[generate_random_int(0, 4)]
+                                poss_change = True
+                            else:
+                                team_OB = defense_team
+                                OB_player = defense_on_court[generate_random_int(0, 4)]
+                            stoppage_type = 'OB'
+                            stoppage = True
+                            print(f"Ball swatted out of bounds off {OB_player.name} by {team_OB.nickname}.")
+                        elif swatOB_or_foul_success > swatOB_or_foul_threshold['hi']:
+                            stoppage = True
+                            team_foul_success = generate_random_int(0, 100)
+                            if team_foul_success < 50:
+                                team_foul = offense_team
+                                foul_player = offense_on_court[generate_random_int(0, 4)]
+                                fouled_player = defense_on_court[generate_random_int(0, 4)]
+                                fouled_team = defense
+                                poss_change = True
+                            else:
+                                team_foul = defense_team
+                                fouled_team = offense
+                                foul_player = defense_on_court[generate_random_int(0, 4)]
+                                fouled_player = offense_on_court[generate_random_int(0, 4)]
+                            team_foul.fouls_in_q += 1
+                            foul_player.game_stats['fouls'] += 1
+                            print(f"Off ball foul committed by {foul_player.name} on {fouled_player.name}.")
+                            # Check to see if team is in the bonus
+                            if team_foul.fouls_in_q > 4 or (team_foul.fouls_in_q > 1 and self.curr_quarter == 'OT'):
+                                poss_change = True
+                                stoppage_type = 'fts'
+                                # Low Result = Make, High result = Miss
+                                initial_ft_threshold = generate_random_int(55, 80)
+                                # MODIFIERS
+                                ft_threshold = self._binary_adjust_threshold(fouled_player.ft_shoot.curr_rating, initial_ft_threshold, 25, 'offense')
+                                made_count = 0
+                                for _ in range(2):
+                                    ft_success = generate_random_int(0, 100)
+                                    if ft_success < ft_threshold:
+                                        made_count += 1
+                                fouled_player.game_stats['ft_taken'] += 2
+                                fouled_player.game_stats['ft_made'] += made_count
+                                fouled_player.game_stats['points'] += made_count
+                                self.game_stat_block[self.curr_quarter][fouled_team]['ft_taken'] += 2
+                                self.game_stat_block[self.curr_quarter][fouled_team]['ft_made'] += made_count
+                                fouled_team.points_in_q += made_count
+                                self._update_plus_minus(offense_on_court, defense_on_court, made_count)
+                                print(f"Free throws awarded to {fouled_player.name}. {fouled_player.name} makes {made_count} / 2 fts.")
+                            else:
+                                stoppage_type = 'OB'
+                        # Determine Rebound
+                        else:
+                            # Low result = Offensive rebound, High result = Defensive Rebound
+                            initial_rebound_threshold = generate_random_int(25, 35)
+                            primary_o_reb = self._determine_primary_offense_rebounder(offense_on_court)
+                            primary_d_reb = self._determine_primary_defense_rebounder(defense_on_court)
+                            # MODIFIERS
+                            offense_mod_rebound_threshold = self._binary_adjust_threshold(primary_o_reb.o_reb.curr_rating, initial_rebound_threshold, 11, 'offense')
+                            rebound_threshold = self._binary_adjust_threshold(primary_d_reb.d_reb.curr_rating, offense_mod_rebound_threshold, 11, 'defense')
+                            # Success Roll
+                            rebound_success = generate_random_int(0, 100)
+                            if rebound_success < rebound_threshold:
+                                primary_o_reb.game_stats['rebounds'] += 1
+                                primary_o_reb.game_stats['offensive_rebounds'] += 1
+                                self.game_stat_block[self.curr_quarter][offense]['rebounds'] += 1
+                                self.game_stat_block[self.curr_quarter][offense]['offensive_rebounds'] += 1
+                                print(f"Offensive rebound secured by {primary_o_reb.name}.")
+                            else:
+                                primary_d_reb.game_stats['rebounds'] += 1
+                                primary_d_reb.game_stats['defensive_rebounds'] += 1
+                                self.game_stat_block[self.curr_quarter][defense]['rebounds'] += 1
+                                self.game_stat_block[self.curr_quarter][defense]['defensive_rebounds'] += 1
+                                poss_change = True
+                                print(f"Defensive rebound secured by {primary_d_reb.name}.")
+                # Contested 3
+                # Determine (3)
+                else:
+                    # Low result = Shooting Foul, High result = Block
+                    block_or_shooting_foul_threshold = {'lo': generate_random_int(2, 5), 'hi': generate_random_int(93, 96)}
+                    # MODIFIERS
+                    self._non_binary_adjust_thresholds(primary_defender.block.curr_rating, block_or_shooting_foul_threshold, 6, 'defense')
+                    self._non_binary_adjust_thresholds(primary_defender.awareness.curr_rating, block_or_shooting_foul_threshold,6, 'defense')
+                    # Success Roll
+                    block_or_shooting_foul_success = generate_random_int(0, 100)
+                    if block_or_shooting_foul_success < block_or_shooting_foul_threshold['lo']:
+                        stoppage = True
+                        stoppage_type = 'fts'
+                        poss_change = True
+                        primary_defender.game_stats['fouls'] += 1
+                        defense_team.fouls_in_q += 1
+                        print(f"Shooting foul committed by {primary_defender.name} on {primary_playmaker.name}.")
+                        # Low Result = Make, High result = Miss
+                        initial_ft_threshold = generate_random_int(55, 80)
+                        # MODIFIERS
+                        ft_threshold = self._binary_adjust_threshold(primary_playmaker.ft_shoot.curr_rating, initial_ft_threshold, 25, 'offense')
+                        made_count = 0
+                        for _ in range(3):
+                            ft_success = generate_random_int(0, 100)
+                            if ft_success < ft_threshold:
+                                made_count += 1
+                        primary_playmaker.game_stats['ft_taken'] += 3
+                        primary_playmaker.game_stats['ft_made'] += made_count
+                        primary_playmaker.game_stats['points'] += made_count
+                        self.game_stat_block[self.curr_quarter][offense]['ft_taken'] += 3
+                        self.game_stat_block[self.curr_quarter][offense]['ft_made'] += made_count
+                        self._update_plus_minus(offense_on_court, defense_on_court, made_count)
+                        offense_team.points_in_q += made_count
+                        print(f"Free throws awarded to {primary_playmaker.name}. {primary_playmaker.name} makes {made_count} / 3 fts.")
+                    elif block_or_shooting_foul_success > block_or_shooting_foul_threshold['hi']:
+                        primary_defender.game_stats['blocks'] += 1
+                        self.game_stat_block[self.curr_quarter][defense]['blocks'] += 1
+                        print(f"Shot blocked by {primary_defender.name}.")
+                        # Low result = Offense gets ball back (OB or no), High result = Defense gets ball back
+                        possession_acquired_threshold = generate_random_int(35, 46)
+                        # NO MODIFIERS (random result)
+                        # Success Roll
+                        possession_acquired_success = generate_random_int(0, 100)
+                        if possession_acquired_success < possession_acquired_threshold:
+                            # Low result = Ball OB off defense, High result = Ball returns to offense off 'rebound'
+                            knock_OB_threshold = generate_random_int(26, 38)
+                            # NO MODIFIERS (random result)
+                            # Success Roll
+                            knock_OB_success = generate_random_int(0, 100)
+                            if knock_OB_success < knock_OB_threshold:
+                                stoppage = True
+                                stoppage_type = 'OB'
+                                print(f"Ball knocked out of bounds by {primary_defender.name}.")
+                            else:
+                                print(f"Ball recovered by {offense_team.nickname} off block.")
+                        else:
+                            poss_change = True
+                            print(f"Ball recovered by {defense_team.nickname} off block.")
+                    else:
+                        initial_contest_3_threshold = generate_random_int(25, 38)
+                        # MODIFIERS
+                        contest_3_threshold = self._binary_adjust_threshold(primary_playmaker.contest_3.curr_rating, initial_contest_3_threshold, 12, 'offense')
+                        # Success roll
+                        contest_3_success = generate_random_int(0, 100)
+                        # If made
+                        if contest_3_success < contest_3_threshold:
+                            primary_playmaker.game_stats['3fg_taken'] += 1
+                            primary_playmaker.game_stats['3fg_made'] += 1
+                            primary_playmaker.game_stats['points'] += 3
+                            self.game_stat_block[self.curr_quarter][offense]['3fg_taken'] += 1
+                            self.game_stat_block[self.curr_quarter][offense]['3fg_made'] += 1
+                            offense_team.points_in_q += 3
+                            self._update_plus_minus(offense_on_court, defense_on_court, 3)
+                            poss_change = True
+                            print(f"{primary_playmaker.name} made contested 3 point basket.")
+                        # If missed
+                        # Determine (4)
+                        else:
+                            print(f"{primary_playmaker.name} missed contested 3 point basket.")
+                            # Low result = Swat OB (determine off whom), High result = Foul (determine on whom)
+                            swatOB_or_foul_threshold = {'lo': generate_random_int(6, 9), 'hi': generate_random_int(93, 96)}
+                            # NO MODIFIERS (random result)
+                            # Success Roll
+                            swatOB_or_foul_success = generate_random_int(0, 100)
+                            if swatOB_or_foul_success < swatOB_or_foul_threshold['lo']:
+                                team_OB_success = generate_random_int(0, 100)
+                                if team_OB_success < 50:
+                                    team_OB = offense_team
+                                    OB_player = offense_on_court[generate_random_int(0, 4)]
+                                    poss_change = True
+                                else:
+                                    team_OB = defense_team
+                                    OB_player = defense_on_court[generate_random_int(0, 4)]
+                                stoppage_type = 'OB'
+                                stoppage = True
+                                print(f"Ball swatted out of bounds off {OB_player.name} by {team_OB.nickname}.")
+                            elif swatOB_or_foul_success > swatOB_or_foul_threshold['hi']:
+                                stoppage = True
+                                team_foul_success = generate_random_int(0, 100)
+                                if team_foul_success < 50:
+                                    team_foul = offense_team
+                                    foul_player = offense_on_court[generate_random_int(0, 4)]
+                                    fouled_player = defense_on_court[generate_random_int(0, 4)]
+                                    fouled_team = defense
+                                    poss_change = True
+                                else:
+                                    team_foul = defense_team
+                                    fouled_team = offense
+                                    foul_player = defense_on_court[generate_random_int(0, 4)]
+                                    fouled_player = offense_on_court[generate_random_int(0, 4)]
+                                team_foul.fouls_in_q += 1
+                                foul_player.game_stats['fouls'] += 1
+                                print(f"Off ball foul committed by {foul_player.name} on {fouled_player.name}.")
+                                # Check to see if team is in the bonus
+                                if team_foul.fouls_in_q > 4 or (team_foul.fouls_in_q > 1 and self.curr_quarter == 'OT'):
+                                    poss_change = True
+                                    stoppage_type = 'fts'
+                                    # Low Result = Make, High result = Miss
+                                    initial_ft_threshold = generate_random_int(55, 80)
+                                    # MODIFIERS
+                                    ft_threshold = self._binary_adjust_threshold(fouled_player.ft_shoot.curr_rating, initial_ft_threshold, 25, 'offense')
+                                    made_count = 0
+                                    for _ in range(2):
+                                        ft_success = generate_random_int(0, 100)
+                                        if ft_success < ft_threshold:
+                                            made_count += 1
+                                    fouled_player.game_stats['ft_taken'] += 2
+                                    fouled_player.game_stats['ft_made'] += made_count
+                                    fouled_player.game_stats['points'] += made_count
+                                    self.game_stat_block[self.curr_quarter][fouled_team]['ft_taken'] += 2
+                                    self.game_stat_block[self.curr_quarter][fouled_team]['ft_made'] += made_count
+                                    fouled_team.points_in_q += made_count
+                                    self._update_plus_minus(offense_on_court, defense_on_court, made_count)
+                                    print(f"Free throws awarded to {fouled_player.name}. {fouled_player.name} makes {made_count} / 2 fts.")
+                                else:
+                                    stoppage_type = 'OB'
+                            # Determine Rebound
+                            else:
+                                # Low result = Offensive rebound, High result = Defensive Rebound
+                                initial_rebound_threshold = generate_random_int(25, 35)
+                                primary_o_reb = self._determine_primary_offense_rebounder(offense_on_court)
+                                primary_d_reb = self._determine_primary_defense_rebounder(defense_on_court)
+                                # MODIFIERS
+                                offense_mod_rebound_threshold = self._binary_adjust_threshold(primary_o_reb.o_reb.curr_rating, initial_rebound_threshold, 11, 'offense')
+                                rebound_threshold = self._binary_adjust_threshold(primary_d_reb.d_reb.curr_rating, offense_mod_rebound_threshold, 11, 'defense')
+                                # Success Roll
+                                rebound_success = generate_random_int(0, 100)
+                                if rebound_success < rebound_threshold:
+                                    primary_o_reb.game_stats['rebounds'] += 1
+                                    primary_o_reb.game_stats['offensive_rebounds'] += 1
+                                    self.game_stat_block[self.curr_quarter][offense]['rebounds'] += 1
+                                    self.game_stat_block[self.curr_quarter][offense]['offensive_rebounds'] += 1
+                                    print(f"Offensive rebound secured by {primary_o_reb.name}.")
+                                else:
+                                    primary_d_reb.game_stats['rebounds'] += 1
+                                    primary_d_reb.game_stats['defensive_rebounds'] += 1
+                                    self.game_stat_block[self.curr_quarter][defense]['rebounds'] += 1
+                                    self.game_stat_block[self.curr_quarter][defense]['defensive_rebounds'] += 1
+                                    poss_change = True
+                                    print(f"Defensive rebound secured by {primary_d_reb.name}.")
 
             # Happens after any result
             self._decrease_stamina_onCourt(primary_playmaker, primary_defender, None, None,

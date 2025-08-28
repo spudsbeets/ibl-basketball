@@ -17,3 +17,9 @@ def get_sorted_roster_by_o_overall(roster):
 
 def get_sorted_roster_by_d_overall(roster):
     return sorted(roster, key=lambda p: p.d_ovr, reverse=True)
+
+def get_sorted_roster_by_d_reb(roster):
+    return sorted(roster, key=lambda p: p.d_reb.curr_rating, reverse=True)
+
+def get_sorted_roster_by_o_reb(roster):
+    return sorted(roster, key=lambda p: p.o_reb.curr_rating, reverse=True)
