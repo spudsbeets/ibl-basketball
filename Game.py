@@ -26,20 +26,27 @@ class Game():
         self.total_plays = self.q1_plays + self.q2_plays + self.q3_plays + self.q4_plays + self.OT_plays_total
         # Initialize empty game state block
         self.game_stat_block = full_game_stat_block
-        # Initialize empty possession tracker
+        # Initialize empty possession tracker, always either 'home_team' or 'away_team'
         self.curr_poss = ''
 
     # Private Methods
+    # SETTING UP GAME SIM
     def _set_onCourt(self):
+        """
+        Sets the initial on court lineup for each team, based on the starters in the Team class.
+        """
         # Reset the onCourt and onBench lists completely
         self.home_onCourt = list(self.home_team.starters.values())
         self.away_onCourt = list(self.away_team.starters.values())
 
         # Everyone else goes to the bench
-        self.home_onBench = self.home_team.bench
-        self.away_onBench = self.away_team.bench
+        self.home_onBench = [p for p in self.home_team.bench if p not in self.home_onCourt]
+        self.away_onBench = [p for p in self.away_team.bench if p not in self.away_onCourt]
 
     def _determine_tipoff(self):
+        """
+        Randomly determines the winner of the tipoff based on C height.
+        """
         randomNum = generate_random_int(0, 100)
         if self.home_team.starters['C'].height - self.away_team.starters['C'].height > 4:
             if randomNum > 70:
@@ -57,7 +64,11 @@ class Game():
             else:
                 self.curr_poss = 'away_team'
 
+    # STAMINA METHODS
     def _increase_stamina_all(self, stoppage_type):
+        """
+        Stamina increase whenever there is a stoppage in play.
+        """
         stamina_dict = {
             'timeout': {'lo': 12, 'hi': 18},
             'OB': {'lo': 2, 'hi': 4},
@@ -76,6 +87,9 @@ class Game():
             print('Error! Unknown stoppage type.')
 
     def _increase_stamina_bench(self, home_bench, away_bench):
+        """
+        Stamina increase for bench whenever a normal play occurs.
+        """
         for player in home_bench:
             player.stamina += min(99, generate_random_int(2, 4))
         for player in away_bench:
@@ -83,6 +97,9 @@ class Game():
 
     def _decrease_stamina_onCourt(self, primary_playmaker, primary_defender, secondary_playmaker, secondary_defender,
                                   offense_on_court, defense_on_court):
+        """
+        Stamina decrease for whoever is on the court, with bigger decreases for active playmakers.
+        """
         teams_on_court = [offense_on_court, defense_on_court]
         for team in teams_on_court:
             for player in team:
@@ -93,29 +110,57 @@ class Game():
                 else:
                     player.stamina -= generate_random_int(2, 5)
 
-
     def _reset_stamina(self):
+        """
+        Resets stamina for every player for halftime and after game is over.
+        """
         for player in self.home_team.roster:
             player.stamina = 99
         for player in self.away_team.roster:
             player.stamina = 99
 
+    # STAT UPDATES
     def _update_play_counts(self):
+        """
+        Updates play count for on court players.
+        """
         for player in self.home_onCourt:
             player.game_stats['plays'] += 1
         for player in self.away_onCourt:
             player.game_stats['plays'] += 1
 
     def _update_plus_minus(self, offense_on_court, defense_on_court, points_scored):
+        """
+        Updates +/- for on court players.
+        """
         for player in offense_on_court:
             player.game_stats['+/-'] += points_scored
         for player in defense_on_court:
             player.game_stats['+/-'] -= points_scored
 
+    def _log_fouls_and_points_by_q(self, home_team, away_team, stat_block, curr_quarter):
+        """
+        Updates fouls and points stats and trackers at the end of every quarter.
+        """
+        stat_block[curr_quarter]['home_team']['fouls'] += home_team.fouls_in_q
+        stat_block[curr_quarter]['away_team']['fouls'] += away_team.fouls_in_q
+        stat_block[curr_quarter]['home_team']['points'] += home_team.points_in_q
+        stat_block[curr_quarter]['away_team']['points'] += away_team.points_in_q
+        stat_block['Full Game']['home_team']['points'] += home_team.points_in_q
+        stat_block['Full Game']['away_team']['points'] += away_team.points_in_q
+        self.home_team.points_total += home_team.points_in_q
+        self.away_team.points_total += away_team.points_in_q
+        home_team.fouls_in_q = 0
+        away_team.fouls_in_q = 0
+        home_team.points_in_q = 0
+        away_team.points_in_q = 0
 
+    # THRESHOLD ADJUSTERS
     def _non_binary_adjust_thresholds(self, rating, threshold_dict, max_change, d_or_o):
-        # Take a rating, threshold_dict (lo and hi vals), the maximum possible manipulation, and
-        # 'defense' or 'offense'. Randomly manipulates possibilites of certain events.
+        """
+        Pseudo-randomly manipulates a dictionary that determines thresholds for the occurrences of certain events.
+        Intended for events with 3 possible outcomes.
+        """
         distance = abs(rating - 50) / 50
         raw_adjust = random.uniform(1, max_change) * distance
         adjustment = math.ceil(raw_adjust)
@@ -145,7 +190,10 @@ class Game():
             threshold_dict['lo'] = threshold_dict['hi']
 
     def _binary_adjust_threshold(self, rating, threshold, max_change, d_or_o):
-        # Same as above but for binary situations, i.e. made or missed shot
+        """
+        Pseudo-randomly manipulates a threshold value that determines the occurrences of certain events.
+        Intended for events with only 2 outcomes.
+        """
         distance = abs(rating - 50) / 50
         raw_adjust = random.uniform(1, max_change) * distance
         adjustment = math.ceil(raw_adjust)
@@ -165,57 +213,71 @@ class Game():
         threshold = max(0, min(99, threshold))
         return threshold
 
-    def _log_fouls_and_points_by_q(self, home_team, away_team, stat_block, curr_quarter):
-        stat_block[curr_quarter]['home_team']['fouls'] += home_team.fouls_in_q
-        stat_block[curr_quarter]['away_team']['fouls'] += away_team.fouls_in_q
-        stat_block[curr_quarter]['home_team']['points'] += home_team.points_in_q
-        stat_block[curr_quarter]['away_team']['points'] += away_team.points_in_q
-        home_team.fouls_in_q = 0
-        away_team.fouls_in_q = 0
-        home_team.points_in_q = 0
-        away_team.points_in_q = 0
-
+    # CHECKS FOR TIMEOUTS AND SUBS
     def _check_for_subs(self):
-        # Add in foul considerations here at some point.
-        for court_player in self.home_onCourt[:]:
-            if court_player.stamina < 30 or court_player not in self.home_team.starters:
-                cp_position = 'guard' if court_player.position in ('PG', 'SG') else 'forward'
-                sorted_home_bench = get_sorted_players(self.home_onBench)
-                for bench_player in sorted_home_bench:
-                    if bench_player.stamina <= 75:
-                        continue  # skip tired bench players
+        """
+        Runs the handle_subs() method for each team to determine if a team wants to substitute any of the
+        players on court for those on the bench.
+        """
+        def handle_subs(on_court, on_bench, starters, team_name):
+            # Check to ensure there is no overlap error between on court and on bench players.
+            overlap = set(on_court) & set(on_bench)
+            if overlap:
+                print(f"⚠️ Overlap detected in {team_name}: {[p.name for p in overlap]} "
+                      f"found in both court and bench. Auto-fixing.")
+                on_bench[:] = [p for p in on_bench if p not in on_court]
 
-                    if (bench_player.position in ('PG', 'SG') and cp_position == 'guard') or \
-                            (bench_player.position in ('SF', 'PF', 'C') and cp_position == 'forward'):
-                        # perform the swap
-                        self.home_onCourt.append(bench_player)
-                        self.home_onBench.remove(bench_player)
-                        self.home_onBench.append(court_player)
-                        self.home_onCourt.remove(court_player)
+            subs_to_make = []
+            available_bench = get_sorted_players(on_bench)[:]  # fresh copy
 
-                        print(f"{court_player.name} ({court_player.position}) subs out for {bench_player.name} ({bench_player.position})")
-                        break  # done once a valid sub is made
+            # Plan substitutions
+            for court_player in on_court:
+                if court_player.stamina < 30 or court_player not in starters.values():
+                    cp_position = 'guard' if court_player.position in ('PG', 'SG') else 'forward'
 
-        for court_player in self.away_onCourt[:]:
-            if court_player.stamina < 30 or court_player not in self.away_team.starters:
-                cp_position = 'guard' if court_player.position in ('PG', 'SG') else 'forward'
-                sorted_home_bench = get_sorted_players(self.away_onBench)
-                for bench_player in sorted_home_bench:
-                    if bench_player.stamina <= 75:
-                        continue  # skip tired bench players
+                    for bench_player in available_bench:
+                        if bench_player.stamina <= 75:
+                            continue
 
-                    if (bench_player.position in ('PG', 'SG') and cp_position == 'guard') or \
-                            (bench_player.position in ('SF', 'PF', 'C') and cp_position == 'forward'):
-                        # perform the swap
-                        self.away_onCourt.append(bench_player)
-                        self.away_onBench.remove(bench_player)
-                        self.away_onBench.append(court_player)
-                        self.away_onCourt.remove(court_player)
+                        if (bench_player.position in ('PG', 'SG') and cp_position == 'guard') or \
+                                (bench_player.position in ('SF', 'PF', 'C') and cp_position == 'forward'):
+                            subs_to_make.append((court_player, bench_player))
+                            available_bench.remove(bench_player)  # prevent reuse
+                            break
 
-                        print(f"{court_player.name} ({court_player.position}) subs out for {bench_player.name} ({bench_player.position})")
-                        break  # done once a valid sub is made
+            # Commit substitutions
+            new_court = list(on_court)
+            new_bench = list(on_bench)
+
+            for out_p, in_p in subs_to_make:
+                if out_p not in new_court or in_p not in new_bench:
+                    print(f"⚠️ Sub inconsistency: {out_p.name} / {in_p.name} not found where expected.")
+                    continue
+
+                new_court.remove(out_p)
+                new_court.append(in_p)
+
+                new_bench.remove(in_p)
+                new_bench.append(out_p)
+
+                print(f"{out_p.name} ({out_p.position}) subs out for {in_p.name} ({in_p.position})")
+
+            # Replace lists in one shot
+            on_court[:] = new_court
+            on_bench[:] = new_bench
+
+            # Check to ensure length of on_court is precisely 5
+            assert len(on_court) == 5, f"{team_name}: Invalid onCourt size {len(on_court)}"
+            assert len(set(on_court)) == 5, f"{team_name}: Duplicate player detected on court!"
+
+        # Run for both teams
+        handle_subs(self.home_onCourt, self.home_onBench, self.home_team.starters, self.home_team.nickname)
+        handle_subs(self.away_onCourt, self.away_onBench, self.away_team.starters, self.away_team.nickname)
 
     def _check_for_timeout(self, offense_on_court, offense_team, defense_team):
+        """
+        Checks whether a team is in a situation where a timeout is a good decision.
+        """
         # Check to see if majority of on court players are gassed
         low_stamina_count = sum(1 for p in offense_on_court if p.stamina <= 25)
 
@@ -232,7 +294,8 @@ class Game():
         if low_stamina_count >= 3:
             rules = timeout_rules.get(self.curr_quarter)
             if offense_team.timeouts >= rules['min_timeouts'] and \
-                    (defense_team.points - offense_team.points) >= rules['min_deficit']:
+                    ((defense_team.points_total + defense_team.points_in_q) -
+                     (offense_team.points_total + offense_team.points_in_q)) >= rules['min_deficit']:
                 print(f"Timeout taken by {offense_team.nickname}")
                 self._update_play_counts()
                 offense_team.timeouts -= 1
@@ -242,102 +305,12 @@ class Game():
 
         return False
 
-    def _determine_primary_playmaker(self, offense_on_court):
-        # Randomize whether high IQ or high playmaker gets the priority for the ball
-        firstRandomNum = generate_random_int(0, 100)
-        if firstRandomNum >= 40:
-            sorted_offense = get_sorted_roster_by_o_overall(offense_on_court)
-        elif firstRandomNum >= 70:
-            sorted_offense = get_sorted_roster_by_awareness(offense_on_court)
-        else:
-            sorted_offense = get_sorted_roster_by_playmaking(offense_on_court)
-
-        # Pseudo-randomly select primary playmaker
-        secondRandomNum = generate_random_int(0, 100)
-
-        if secondRandomNum < 40:
-            return sorted_offense[0]
-        elif secondRandomNum < 70:
-            return sorted_offense[1]
-        elif secondRandomNum < 90:
-            return sorted_offense[2]
-        elif secondRandomNum < 95:
-            return sorted_offense[3]
-        else:
-            return sorted_offense[4]
-
-    def _determine_primary_offense_rebounder(self, offense_on_court):
-        sorted_offense = get_sorted_roster_by_o_reb(offense_on_court)
-
-        offense_random_num = generate_random_int(0, 100)
-
-        if offense_random_num < 40:
-            return sorted_offense[0]
-        elif offense_random_num < 70:
-            return sorted_offense[1]
-        elif offense_random_num < 90:
-            return sorted_offense[2]
-        elif offense_random_num < 95:
-            return sorted_offense[3]
-        else:
-            return sorted_offense[4]
-
-    def _determine_primary_defense_rebounder(self, defense_on_court):
-        sorted_defense = get_sorted_roster_by_d_reb(defense_on_court)
-
-        defense_random_num = generate_random_int(0, 100)
-
-        if defense_random_num < 40:
-            return sorted_defense[0]
-        elif defense_random_num < 70:
-            return sorted_defense[1]
-        elif defense_random_num < 90:
-            return sorted_defense[2]
-        elif defense_random_num < 95:
-            return sorted_defense[3]
-        else:
-            return sorted_defense[4]
-
-    def _determine_matchups(self, offense_on_court, defense_on_court, defensive_scheme):
-
-        assignments = {}
-        assigned_defenders = set()  # track who is already assigned
-        sorted_offense = get_sorted_roster_by_o_overall(offense_on_court)
-        sorted_defense = get_sorted_roster_by_d_overall(defense_on_court)
-
-        if defensive_scheme == 'MAN':
-            for player in sorted_offense:
-                off_pos = player.position
-
-                # Determine which defender positions can guard this offensive player
-                if off_pos in ('PG', 'SG'):
-                    guardable_positions = ('PG', 'SG', 'SF')
-                elif off_pos == 'SF':
-                    guardable_positions = None  # anyone can guard
-                else:  # PF/C
-                    guardable_positions = ('SF', 'PF', 'C')
-
-                # Find the best unassigned defender who can guard this offensive player
-                for defender in sorted_defense:
-                    if defender in assigned_defenders:
-                        continue
-                    if guardable_positions is None or defender.position in guardable_positions:
-                        assignments[player.name] = defender
-                        assigned_defenders.add(defender)
-                        break
-                else:
-                    # fallback if no match: assign the best remaining defender
-                    for defender in sorted_defense:
-                        if defender not in assigned_defenders:
-                            assignments[player.name] = defender
-                            assigned_defenders.add(defender)
-                            break
-        else:
-            print('we aint worried bout this yet')
-
-        return assignments
-
+    # DETERMINES PLAYS/PLAYMAKERS
     def _determine_play_type(self, primary_playmaker, primary_defender):
+        """
+        Based off primary playmaker and defender strengths and weaknesses, determines with a degree of
+        randomness what kind of basketball play will be attempted.
+        """
         # Returns a string from these OPTIONS:
         # 'create_3'
         # 'create_mid'
@@ -426,9 +399,119 @@ class Game():
         else:
             return 'find_cutter'
 
+    def _determine_primary_playmaker(self, offense_on_court):
+        """
+        Determines who the primary playmaker for the offense will be on a given play.
+        """
+        # Randomize whether high IQ or high playmaker gets the priority for the ball
+        firstRandomNum = generate_random_int(0, 100)
+        if firstRandomNum >= 40:
+            sorted_offense = get_sorted_roster_by_o_overall(offense_on_court)
+        elif firstRandomNum >= 70:
+            sorted_offense = get_sorted_roster_by_awareness(offense_on_court)
+        else:
+            sorted_offense = get_sorted_roster_by_playmaking(offense_on_court)
+
+        # Pseudo-randomly select primary playmaker
+        secondRandomNum = generate_random_int(0, 100)
+
+        if secondRandomNum < 40:
+            return sorted_offense[0]
+        elif secondRandomNum < 70:
+            return sorted_offense[1]
+        elif secondRandomNum < 90:
+            return sorted_offense[2]
+        elif secondRandomNum < 95:
+            return sorted_offense[3]
+        else:
+            return sorted_offense[4]
+
+    def _determine_primary_offense_rebounder(self, offense_on_court):
+        """
+        Determines which offensive player is gunning for an offensive rebound on a given play.
+        """
+        sorted_offense = get_sorted_roster_by_o_reb(offense_on_court)
+
+        offense_random_num = generate_random_int(0, 100)
+
+        if offense_random_num < 40:
+            return sorted_offense[0]
+        elif offense_random_num < 70:
+            return sorted_offense[1]
+        elif offense_random_num < 90:
+            return sorted_offense[2]
+        elif offense_random_num < 95:
+            return sorted_offense[3]
+        else:
+            return sorted_offense[4]
+
+    def _determine_primary_defense_rebounder(self, defense_on_court):
+        """
+        Determines which defensive player is gunning for a defensive rebound on a given play.
+        """
+        sorted_defense = get_sorted_roster_by_d_reb(defense_on_court)
+
+        defense_random_num = generate_random_int(0, 100)
+
+        if defense_random_num < 40:
+            return sorted_defense[0]
+        elif defense_random_num < 70:
+            return sorted_defense[1]
+        elif defense_random_num < 90:
+            return sorted_defense[2]
+        elif defense_random_num < 95:
+            return sorted_defense[3]
+        else:
+            return sorted_defense[4]
+
+    def _determine_matchups(self, offense_on_court, defense_on_court, defensive_scheme):
+        """
+        Returns a dictionary that matches each player up to their most sensible defensive counterpart.
+        """
+
+        assignments = {}
+        assigned_defenders = set()  # track who is already assigned
+        sorted_offense = get_sorted_roster_by_o_overall(offense_on_court)
+        sorted_defense = get_sorted_roster_by_d_overall(defense_on_court)
+
+        if defensive_scheme == 'MAN':
+            for player in sorted_offense:
+                off_pos = player.position
+
+                # Determine which defender positions can guard this offensive player
+                if off_pos in ('PG', 'SG'):
+                    guardable_positions = ('PG', 'SG', 'SF')
+                elif off_pos == 'SF':
+                    guardable_positions = None  # anyone can guard
+                else:  # PF/C
+                    guardable_positions = ('SF', 'PF', 'C')
+
+                # Find the best unassigned defender who can guard this offensive player
+                for defender in sorted_defense:
+                    if defender in assigned_defenders:
+                        continue
+                    if guardable_positions is None or defender.position in guardable_positions:
+                        assignments[player.name] = defender
+                        assigned_defenders.add(defender)
+                        break
+                else:
+                    # fallback if no match: assign the best remaining defender
+                    for defender in sorted_defense:
+                        if defender not in assigned_defenders:
+                            assignments[player.name] = defender
+                            assigned_defenders.add(defender)
+                            break
+        else:
+            print('we aint worried bout this yet')
+
+        return assignments
+
     def _determine_play_outcome(self, primary_playmaker, primary_defender, play_type,
                                 offense_team, defense_team, offense_on_court, defense_on_court,
                                 offense_on_bench, defense_on_bench):
+        """
+        Determines the outcome(s) of a play and updates stats and trackers accordingly.
+        """
         # POSSIBLE OUTCOMES
         # (Make or miss) (self-created or pass-created) (open or contested) shot (layup, dunk, 2, or 3)
         # Defensive foul (ft's or OB --> Bonus @ foul #5)
@@ -444,7 +527,7 @@ class Game():
 
         # Add Potential for fast break bucket (off turnover, low chance off d-reb) later...
         # Add injury possibility later...
-        # Add foul out logic later
+        # Add foul out logic later...
 
         # SETUP
         if self.curr_poss == 'home_team':
@@ -457,6 +540,9 @@ class Game():
         stoppage = False
         stoppage_type = None
         poss_change = False
+
+        secondary_playmaker = None
+        secondary_defender = None
 
         if play_type == 'create_3':
             print('create_3')
@@ -739,13 +825,15 @@ class Game():
                                 team_foul_success = generate_random_int(0, 100)
                                 if team_foul_success < 50:
                                     team_foul = offense_team
+                                    fouled_team = defense_team
+                                    fouled_team_stats = defense
                                     foul_player = offense_on_court[generate_random_int(0, 4)]
                                     fouled_player = defense_on_court[generate_random_int(0, 4)]
-                                    fouled_team = defense
                                     poss_change = True
                                 else:
                                     team_foul = defense_team
-                                    fouled_team = offense
+                                    fouled_team = offense_team
+                                    fouled_team_stats = offense
                                     foul_player = defense_on_court[generate_random_int(0, 4)]
                                     fouled_player = offense_on_court[generate_random_int(0, 4)]
                                 team_foul.fouls_in_q += 1
@@ -767,8 +855,8 @@ class Game():
                                     fouled_player.game_stats['ft_taken'] += 2
                                     fouled_player.game_stats['ft_made'] += made_count
                                     fouled_player.game_stats['points'] += made_count
-                                    self.game_stat_block[self.curr_quarter][fouled_team]['ft_taken'] += 2
-                                    self.game_stat_block[self.curr_quarter][fouled_team]['ft_made'] += made_count
+                                    self.game_stat_block[self.curr_quarter][fouled_team_stats]['ft_taken'] += 2
+                                    self.game_stat_block[self.curr_quarter][fouled_team_stats]['ft_made'] += made_count
                                     fouled_team.points_in_q += made_count
                                     self._update_plus_minus(offense_on_court, defense_on_court, made_count)
                                     print(f"Free throws awarded to {fouled_player.name}. {fouled_player.name} makes {made_count} / 2 fts.")
@@ -799,18 +887,6 @@ class Game():
                                     poss_change = True
                                     print(f"Defensive rebound secured by {primary_d_reb.name}.")
 
-            # Happens after any result
-            self._decrease_stamina_onCourt(primary_playmaker, primary_defender, None, None,
-                                           offense_on_court, defense_on_court)
-            self._update_play_counts()
-            if poss_change:
-                self.curr_poss = defense
-            if not stoppage:
-                self._increase_stamina_bench(offense_on_bench, defense_on_bench)
-            else:
-                self._increase_stamina_all(stoppage_type)
-                self._check_for_subs()
-
         elif play_type == 'create_mid':
             print('create_mid')
         elif play_type == 'iso_drive':
@@ -824,7 +900,22 @@ class Game():
         else:
             print('find_cutter')
 
+        # Happens after any result
+        self._decrease_stamina_onCourt(primary_playmaker, primary_defender, secondary_playmaker, secondary_defender,
+                                       offense_on_court, defense_on_court)
+        self._update_play_counts()
+        if poss_change:
+            self.curr_poss = defense
+        if not stoppage:
+            self._increase_stamina_bench(offense_on_bench, defense_on_bench)
+        else:
+            self._increase_stamina_all(stoppage_type)
+            self._check_for_subs()
+
     def _simulate_play(self):
+        """
+        Simulates a play.
+        """
         # SETUP
 
         # Default all defensive schemes to man, will be more involved later on
@@ -866,9 +957,35 @@ class Game():
 
     # Public Methods
     def simulate_game(self):
-        # Get game started
+        """
+        Simulate a full game.
+        """
+        # Get game setup
         self._determine_tipoff()
         self._set_onCourt()
+        # Print out rosters with basic ratings
+        print({'TEAM': self.home_team.nickname})
+        for player in self.home_onCourt:
+            print({
+                'name': player.name,
+                'position': player.position,
+                'overall': player.overall,
+                'o_ovr': player.o_ovr,
+                'd_ovr': player.d_ovr,
+                'open_3': player.open_3.curr_rating,
+                'contest_3': player.contest_3.curr_rating
+            })
+        print({'TEAM': self.away_team.nickname})
+        for player in self.away_onCourt:
+            print({
+                'name': player.name,
+                'position': player.position,
+                'overall': player.overall,
+                'o_ovr': player.o_ovr,
+                'd_ovr': player.d_ovr,
+                'open_3': player.open_3.curr_rating,
+                'contest_3': player.contest_3.curr_rating
+            })
         # Simulate Q1
         for _ in range(self.q1_plays):
             self._simulate_play()
@@ -890,28 +1007,32 @@ class Game():
         for _ in range(self.q3_plays):
             self._simulate_play()
         print('END Q3')
+        # Log stats, reset trackers
         self._log_fouls_and_points_by_q(self.home_team, self.away_team, self.game_stat_block, self.curr_quarter)
         # Simulate Q4
         self.curr_quarter = 4
         for _ in range(self.q4_plays):
             self._simulate_play()
         print('END Q4')
+        # Log stats, reset trackers
         self._log_fouls_and_points_by_q(self.home_team, self.away_team, self.game_stat_block, self.curr_quarter)
         # Simulate OT if needed
         # Two timeouts awarded to each team for OT periods
         self.home_team.timeouts = 2
         self.away_team.timeouts = 2
         self.curr_quarter = 'OT'
+        # Count the number of OTs
+        ot_count = 1
         while self.home_team.points_total == self.away_team.points_total:
             self.OT_plays_current += generate_random_int(13, 20)
             self.OT_plays_total += self.OT_plays_current
             for _ in range (self.OT_plays_current):
                 self._simulate_play()
-            self.home_team.fouls_in_q = 0
-            self.away_team.fouls_in_q = 0
+            print(f"END OT{ot_count}")
+            self._log_fouls_and_points_by_q(self.home_team, self.away_team, self.game_stat_block, self.curr_quarter)
             self.OT_plays_current = 0
+            ot_count += 1
         print('END GAME')
-        self._log_fouls_and_points_by_q(self.home_team, self.away_team, self.game_stat_block, self.curr_quarter)
         # Log player stats and game stats
 
         # Reset starters, stamina, and trackers for next game
