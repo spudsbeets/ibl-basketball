@@ -75,14 +75,12 @@ class Game():
             'fts': {'lo': 3, 'hi': 6}
         }
         if stoppage_type in stamina_dict:
-            for player in self.home_team.roster:
-                increase = generate_random_int(stamina_dict[stoppage_type]['lo'],
-                                                stamina_dict[stoppage_type]['hi'])
-                player.stamina = min(99, player.stamina + increase)
-            for player in self.away_team.roster:
-                increase = generate_random_int(stamina_dict[stoppage_type]['lo'],
-                                                stamina_dict[stoppage_type]['hi'])
-                player.stamina = min(99, player.stamina + increase)
+            for player in self.home_team.roster + self.away_team.roster:
+                base_increase = generate_random_int(stamina_dict[stoppage_type]['lo'], stamina_dict[stoppage_type]['hi'])
+                # Endurance modifier
+                modifier = (player.endurance.curr_rating - 50) / 50  # -1.0 .. +1.0
+                adjustment = int(base_increase * (modifier * 0.2))  # up to ±20%
+                player.stamina = min(99, player.stamina + base_increase + adjustment)
         else:
             print('Error! Unknown stoppage type.')
 
@@ -90,13 +88,14 @@ class Game():
         """
         Stamina increase for bench whenever a normal play occurs.
         """
-        for player in home_bench:
-            player.stamina += min(99, generate_random_int(2, 4))
-        for player in away_bench:
-            player.stamina += min(99, generate_random_int(2, 4))
+        for player in home_bench + away_bench:
+            base_increase = generate_random_int(2, 4)
+            modifier = (player.endurance.curr_rating - 50) / 50
+            adjustment = int(base_increase * (modifier * 0.2))
+            player.stamina = min(99, player.stamina + base_increase + adjustment)
 
     def _decrease_stamina_onCourt(self, primary_playmaker, primary_defender, secondary_playmaker, secondary_defender,
-                                  offense_on_court, defense_on_court):
+                                  offense_on_court, defense_on_court, primary_o_reb, primary_d_reb):
         """
         Stamina decrease for whoever is on the court, with bigger decreases for active playmakers.
         """
@@ -104,11 +103,15 @@ class Game():
         for team in teams_on_court:
             for player in team:
                 if player == primary_playmaker or player == primary_defender:
-                    player.stamina -= generate_random_int(5, 8)
-                elif player == secondary_playmaker or player == secondary_defender:
-                    player.stamina -= generate_random_int(4, 7)
+                    base_decrease = generate_random_int(5, 8)
+                elif player == secondary_playmaker or player == secondary_defender or player == primary_o_reb or player == primary_d_reb:
+                    base_decrease = generate_random_int(4, 7)
                 else:
-                    player.stamina -= generate_random_int(2, 5)
+                    base_decrease = generate_random_int(2, 5)
+
+                modifier = (player.endurance.curr_rating - 50) / 50
+                adjustment = int(base_decrease * (modifier * -0.2))  # high endurance = smaller decrease
+                player.stamina -= base_decrease + adjustment
 
     def _reset_stamina(self):
         """
@@ -562,7 +565,7 @@ class Game():
             self.game_stat_block[self.curr_quarter][defense]['defensive_rebounds'] += 1
             poss_change = True
             print(f"Defensive rebound secured by {primary_d_reb.name} ({primary_d_reb.position}).")
-        return poss_change
+        return (poss_change, primary_o_reb, primary_d_reb)
 
     def _make_a_three(self, primary_playmaker, offense, offense_team, offense_on_court, defense_on_court):
         """
@@ -631,22 +634,45 @@ class Game():
         print(f"Ball stolen from {primary_playmaker.name} by {primary_defender.name}({primary_defender.position}).")
         return True
 
+    def _record_a_block(self, primary_defender, defense, defense_team, offense_team):
+        """
+        Records stats for a block, returns a tuple to determine (stoppage, stoppage_type, poss_change)
+        """
+        stoppage = False
+        stoppage_type = None
+        poss_change = False
+
+        primary_defender.game_stats['blocks'] += 1
+        self.game_stat_block[self.curr_quarter][defense]['blocks'] += 1
+        print(f"Shot blocked by {primary_defender.name}({primary_defender.position}, {defense_team.nickname}).")
+        # Low result = Offense gets ball back (OB or no), High result = Defense gets ball back
+        possession_acquired_threshold = generate_random_int(35, 46)
+        # NO MODIFIERS (random result)
+        # Success Roll
+        possession_acquired_success = generate_random_int(0, 100)
+        if possession_acquired_success < possession_acquired_threshold:
+            # Low result = Ball OB off defense, High result = Ball returns to offense off 'rebound'
+            knock_OB_threshold = generate_random_int(26, 38)
+            # NO MODIFIERS (random result)
+            # Success Roll
+            knock_OB_success = generate_random_int(0, 100)
+            if knock_OB_success < knock_OB_threshold:
+                stoppage = True
+                stoppage_type = 'OB'
+                print(f"Ball knocked out of bounds by {primary_defender.name}.")
+            else:
+                print(f"Ball recovered by {offense_team.nickname} off block.")
+        else:
+            poss_change = True
+            print(f"Ball recovered by {defense_team.nickname} off block.")
+        return (stoppage, stoppage_type, poss_change)
+
     def _determine_play_outcome(self, primary_playmaker, primary_defender, play_type,
                                 offense_team, defense_team, offense_on_court, defense_on_court,
                                 offense_on_bench, defense_on_bench):
         """
         Determines the outcome(s) of a play and updates stats and trackers accordingly.
         """
-        # POSSIBLE OUTCOMES
-        # (Make or miss) (self-created or pass-created) (open or contested) shot (layup, dunk, 2, or 3)
-        # Defensive foul (ft's or OB --> Bonus @ foul #5)
-        # Blocked shot (offensive rebound, defensive rebound, or knocked OB)
-        # Knocked out of bounds (repeat offense)
-        # Offensive rebound off miss (put back potential or kick out and repeat offense)
-        # Stolen ball (possession change)
-        # Offensive foul (OB --> possession change)
-        # Defensive rebound off miss (possession change)
-
         # GREATER VALUES --> Good for defense
         # LESSER VALUES --> Good for offense
 
@@ -669,18 +695,29 @@ class Game():
         secondary_playmaker = None
         secondary_defender = None
 
-        if play_type in ('create_3', 'create_mid', 'iso_drive', 'post_up'):
-            print(play_type)
+        primary_d_reb = None
+        primary_o_reb = None
+
         # OFFENSIVE RATINGS AT PLAY:
-        # PRIMARY --> Playmaking (ability to get open) -> open_3/mid or contest_3/mid,
-        # ALL --> Miss -> Offensive Rebound
+        # PRIMARY --> playmaking (ability to get open for open_3/mid or contest_3/mid)
+        #             open_3/open_mid (for open shots)
+        #             constest_3/contest_mid/finishing/post_up (for contested shots)
+        #             awareness (ability to make good decision)
+        #             ft_shoot (when fts are awarded)
+        # PRIMARY_O_REB --> o_reb (off miss)
         # DEFENSIVE RATINGS AT PLAY:
-        # PRIMARY --> Stickiness (ability to prevent getting open), Steal (poke the ball out), Block (if shot gets off)
-        # ALL --> Miss -> Defensive Rebound
-        # POSSIBILITY TREE --> 1) Determine Steal or reach-in foul, 2) Determine Open or Contested (create_3 and create_mid only),
+        # PRIMARY --> stickiness (ability to prevent getting open)
+        #             steal (poke the ball out)
+        #             block (if shot gets off)
+        #             awareness (good decision making)
+        # PRIMARY_D_REB --> d_reb (off miss)
+        # POSSIBILITY TREE --> 1) Determine Steal or reach-in foul,
+        # 2) Determine Open or Contested (create_3 and create_mid only),
         # 3) Determine Block, Shooting Foul, Make, or Miss (contested only for block/foul),
         # 4) Off miss, determine Offensive Rebound, Defensive Rebound, Off-ball foul, or Swat OB,
         # 5) Update stats, points, possession, stamina, substitutes where necessary
+        if play_type in ('create_3', 'create_mid', 'iso_drive', 'post_up'):
+            print(play_type)
             # Determine (1)
             # Low result = reach-in foul, High result = steal
             if play_type == 'create_3' or play_type == 'post_up':
@@ -798,7 +835,7 @@ class Game():
                                 stoppage_type = 'OB'
                         # Determine Rebound
                         else:
-                            poss_change = self._rebound_ball(offense_on_court, defense_on_court, offense, defense)
+                            (poss_change, primary_o_reb, primary_d_reb) = self._rebound_ball(offense_on_court, defense_on_court, offense, defense)
                 # Contested 3
                 # Determine (3)
                 else:
@@ -823,29 +860,8 @@ class Game():
                         else:
                             stoppage_type = self._shoot_fts(primary_playmaker, 2, offense, offense_team, offense_on_court, defense_on_court)
                     elif block_or_shooting_foul_success > block_or_shooting_foul_threshold['hi']:
-                        primary_defender.game_stats['blocks'] += 1
-                        self.game_stat_block[self.curr_quarter][defense]['blocks'] += 1
-                        print(f"Shot blocked by {primary_defender.name}({primary_defender.position}, {defense_team.nickname}).")
-                        # Low result = Offense gets ball back (OB or no), High result = Defense gets ball back
-                        possession_acquired_threshold = generate_random_int(35, 46)
-                        # NO MODIFIERS (random result)
-                        # Success Roll
-                        possession_acquired_success = generate_random_int(0, 100)
-                        if possession_acquired_success < possession_acquired_threshold:
-                            # Low result = Ball OB off defense, High result = Ball returns to offense off 'rebound'
-                            knock_OB_threshold = generate_random_int(26, 38)
-                            # NO MODIFIERS (random result)
-                            # Success Roll
-                            knock_OB_success = generate_random_int(0, 100)
-                            if knock_OB_success < knock_OB_threshold:
-                                stoppage = True
-                                stoppage_type = 'OB'
-                                print(f"Ball knocked out of bounds by {primary_defender.name}.")
-                            else:
-                                print(f"Ball recovered by {offense_team.nickname} off block.")
-                        else:
-                            poss_change = True
-                            print(f"Ball recovered by {defense_team.nickname} off block.")
+                        (stoppage, stoppage_type, poss_change) = self._record_a_block(primary_defender, defense, defense_team, offense_team)
+
                     else:
                         if play_type == 'create_3':
                             initial_contest_threshold = generate_random_int(20, 33)
@@ -913,7 +929,7 @@ class Game():
                                     stoppage_type = 'OB'
                             # Determine Rebound
                             else:
-                                poss_change = self._rebound_ball(offense_on_court, defense_on_court, offense, defense)
+                                (poss_change, primary_o_reb, primary_d_reb) = self._rebound_ball(offense_on_court, defense_on_court, offense, defense)
             # Post ups and Iso Drives
             else:
                 # Low result = No foul, High result = Offensive foul
@@ -945,29 +961,7 @@ class Game():
                     print(f"Shooting foul committed by {primary_defender.name}({defense_team.nickname}) on {primary_playmaker.name}({offense_team.nickname}).")
                     stoppage_type = self._shoot_fts(primary_playmaker, 2, offense, offense_team, offense_on_court, defense_on_court)
                 elif block_or_shooting_foul_success > block_or_shooting_foul_threshold['hi']:
-                    primary_defender.game_stats['blocks'] += 1
-                    self.game_stat_block[self.curr_quarter][defense]['blocks'] += 1
-                    print(f"Shot blocked by {primary_defender.name}({primary_defender.position}, {defense_team.nickname}).")
-                    # Low result = Offense gets ball back (OB or no), High result = Defense gets ball back
-                    possession_acquired_threshold = generate_random_int(35, 46)
-                    # NO MODIFIERS (random result)
-                    # Success Roll
-                    possession_acquired_success = generate_random_int(0, 100)
-                    if possession_acquired_success < possession_acquired_threshold:
-                        # Low result = Ball OB off defense, High result = Ball returns to offense off 'rebound'
-                        knock_OB_threshold = generate_random_int(26, 38)
-                        # NO MODIFIERS (random result)
-                        # Success Roll
-                        knock_OB_success = generate_random_int(0, 100)
-                        if knock_OB_success < knock_OB_threshold:
-                            stoppage = True
-                            stoppage_type = 'OB'
-                            print(f"Ball knocked out of bounds by {primary_defender.name}.")
-                        else:
-                            print(f"Ball recovered by {offense_team.nickname} off block.")
-                    else:
-                        poss_change = True
-                        print(f"Ball recovered by {defense_team.nickname} off block.")
+                    (stoppage, stoppage_type, poss_change) = self._record_a_block(primary_defender, defense, defense_team, offense_team)
                 else:
                     if play_type == 'iso_drive':
                         initial_shot_threshold = generate_random_int(42, 51)
@@ -1037,18 +1031,44 @@ class Game():
                                 stoppage_type = 'OB'
                         # Determine Rebound
                         else:
-                            poss_change = self._rebound_ball(offense_on_court, defense_on_court, offense, defense)
-
-        elif play_type == 'pick_n_roll':
-            print('pick_n_roll')
-        elif play_type == 'drive_n_pass':
-            print('drive_n_pass')
+                            (poss_change, primary_o_reb, primary_d_reb) = self._rebound_ball(offense_on_court, defense_on_court, offense, defense)
+        # play_type == pick_n_roll, drive_n_pass, find_cutter
+        #
+        # OFFENSIVE RATINGS AT PLAY:
+        # PRIMARY --> playmaking (ability to make good pass)
+        #             awareness (ability to make good decision)
+        #             open_3/open_mid (for open shots)
+        #             constest_3/contest_mid/finishing/post_up (for contested shots)
+        #             ft_shoot (when fts are awarded)
+        # SECONDARY --> playmaking (ability to make good pass --> pick_n_roll only)
+        #               awareness (ability to make good decision --> pick_n_roll only)
+        #               open_3/open_mid (for open shots)
+        #               constest_3/contest_mid/finishing/post_up (for contested shots)
+        #               ft_shoot (when fts are awarded)
+        # PRIMARY_O_REB --> o_reb (off miss)
+        # DEFENSIVE RATINGS AT PLAY:
+        # PRIMARY --> stickiness (ability to prevent getting open)
+        #             steal (poke the ball out)
+        #             block (if shot gets off)
+        #             awareness (good decision making)
+        # SECONDARY --> stickiness (ability to prevent getting open)
+        #               steal (poke the ball out)
+        #               block (if shot gets off)
+        #               awareness (good decision making)
+        # PRIMARY_D_REB --> d_reb (off miss)
+        # POSSIBILITY TREE --> 1) Determine Steal or reach-in foul,
+        # 2) Determine Successful pass(es) or turnover (pick_n_roll --> 0, 1, or 2 passes, all others exactly 1)
+        # 3) Determine secondary playmaker and defender,
+        # 4) Determine shot type (and shot taker for pick_n_roll)
+        # 5) Determine Block, Shooting Foul, Make, or Miss (contested only for block/foul),
+        # 6) Off miss, determine Offensive Rebound, Defensive Rebound, Off-ball foul, or Swat OB,
+        # 7) Update stats, points, possession, stamina, substitutes where necessary
         else:
-            print('find_cutter')
+            print(play_type)
 
         # Happens after any result
         self._decrease_stamina_onCourt(primary_playmaker, primary_defender, secondary_playmaker, secondary_defender,
-                                       offense_on_court, defense_on_court)
+                                       offense_on_court, defense_on_court, primary_o_reb, primary_d_reb)
         self._update_play_counts()
         if poss_change:
             self.curr_poss = defense
