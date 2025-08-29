@@ -67,6 +67,8 @@ def generate_entry_draft_player():
                                                     span[position][build]['d_reb']['high']), 0, 99)
         finishing = Rating('finishing', generate_random_int(round(span[position][build]['finishing']['high'] * .6),
                                                     span[position][build]['finishing']['high']), 0, 99)
+        post_up = Rating('post_up', generate_random_int(round(span[position][build]['post_up']['high'] * .6),
+                                                    span[position][build]['post_up']['high']), 0, 99)
     else:
         o_reb = Rating('o_reb', generate_random_int(span[position][build]['o_reb']['low'],
                                                     round(span[position][build]['o_reb']['high'] * .75)), 0, 99)
@@ -74,8 +76,10 @@ def generate_entry_draft_player():
                                                     round(span[position][build]['d_reb']['high'] * .75)), 0, 99)
         finishing = Rating('finishing', generate_random_int(span[position][build]['finishing']['low'],
                                                     round(span[position][build]['finishing']['high'] * .75)), 0, 99)
+        post_up = Rating('post_up', generate_random_int(span[position][build]['post_up']['low'],
+                                                    round(span[position][build]['post_up']['high'] * .75)), 0, 99)
 
-    open_mid = Rating('open_mid', generate_random_int(span[position][build]['finishing']['low'],
+    open_mid = Rating('open_mid', generate_random_int(span[position][build]['open_mid']['low'],
                                                       span[position][build]['open_mid']['high']), 0, 99)
 
     # If player is generally good shooter, boost shooting stats
@@ -141,7 +145,7 @@ def generate_entry_draft_player():
 
 
     return Player(player_name, height, weight, position, region, 0, age,
-                  mercuriality, 'Average', character, o_reb, finishing, open_mid, open_3, contest_mid, contest_3,
+                  mercuriality, 'Average', character, o_reb, finishing, post_up, open_mid, open_3, contest_mid, contest_3,
                   playmaking, ft_shoot, d_reb, block, steal, stickiness, awareness, endurance, confidence, speed, strength)
 
 def generate_normal_draft_player():
@@ -195,6 +199,8 @@ def generate_normal_draft_player():
                                                     span[position][build]['d_reb']['high']), 0, 99)
         finishing = Rating('finishing', generate_random_int(round(span[position][build]['finishing']['high'] * .6),
                                                     span[position][build]['finishing']['high']), 0, 99)
+        post_up = Rating('post_up', generate_random_int(round(span[position][build]['post_up']['high'] * .6),
+                                                    span[position][build]['post_up']['high']), 0, 99)
     else:
         o_reb = Rating('o_reb', generate_random_int(span[position][build]['o_reb']['low'],
                                                     round(span[position][build]['o_reb']['high'] * .75)), 0, 99)
@@ -202,8 +208,10 @@ def generate_normal_draft_player():
                                                     round(span[position][build]['d_reb']['high'] * .75)), 0, 99)
         finishing = Rating('finishing', generate_random_int(span[position][build]['finishing']['low'],
                                                     round(span[position][build]['finishing']['high'] * .75)), 0, 99)
+        post_up = Rating('post_up', generate_random_int(span[position][build]['post_up']['low'],
+                                                    round(span[position][build]['post_up']['high'] * .75)), 0, 99)
 
-    open_mid = Rating('open_mid', generate_random_int(span[position][build]['finishing']['low'],
+    open_mid = Rating('open_mid', generate_random_int(span[position][build]['open_mid']['low'],
                                                       span[position][build]['open_mid']['high']), 0, 99)
 
     # If player is generally good shooter, boost shooting stats
@@ -272,5 +280,5 @@ def generate_normal_draft_player():
 
 
     return Player(player_name, height, weight, position, region, 0, age,
-                  mercuriality, 'Average', character, o_reb, finishing, open_mid, open_3, contest_mid, contest_3,
+                  mercuriality, 'Average', character, o_reb, finishing, post_up, open_mid, open_3, contest_mid, contest_3,
                   playmaking, ft_shoot, d_reb, block, steal, stickiness, awareness, endurance, confidence, speed, strength)

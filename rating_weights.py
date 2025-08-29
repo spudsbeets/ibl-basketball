@@ -1,56 +1,61 @@
 pg_weight_offense = {
     'o_reb': .05,
     'finishing': .15,
-    'open_mid': .11,
-    'open_3': .11,
+    'post_up': .03,
+    'open_mid': .1,
+    'open_3': .1,
     'contest_mid': .1,
     'contest_3': .1,
-    'playmaking': .28,
+    'playmaking': .27,
     'ft_shoot': .1
 }
 
 sg_weight_offense = {
     'o_reb': .05,
     'finishing': .12,
-    'open_mid': .16,
-    'open_3': .16,
+    'post_up': .03,
+    'open_mid': .15,
+    'open_3': .15,
     'contest_mid': .14,
     'contest_3': .14,
-    'playmaking': .13,
+    'playmaking': .12,
     'ft_shoot': .1
 }
 
 sf_weight_offense = {
     'o_reb': .1,
-    'finishing': .18,
-    'open_mid': .14,
-    'open_3': .12,
-    'contest_mid': .14,
-    'contest_3': .12,
+    'finishing': .16,
+    'post_up': .06,
+    'open_mid': .13,
+    'open_3': .11,
+    'contest_mid': .13,
+    'contest_3': .11,
     'playmaking': .1,
     'ft_shoot': .1
 }
 
 pf_weight_offense = {
-    'o_reb': .15,
-    'finishing': .21,
-    'open_mid': .13,
-    'open_3': .1,
-    'contest_mid': .13,
-    'contest_3': .1,
-    'playmaking': .08,
+    'o_reb': .14,
+    'finishing': .18,
+    'post_up': .11,
+    'open_mid': .12,
+    'open_3': .09,
+    'contest_mid': .12,
+    'contest_3': .08,
+    'playmaking': .06,
     'ft_shoot': .1
 }
 
 c_weight_offense = {
-    'o_reb': .2,
-    'finishing': .25,
-    'open_mid': .11,
-    'open_3': .09,
-    'contest_mid': .11,
-    'contest_3': .09,
-    'playmaking': .05,
-    'ft_shoot': .1
+    'o_reb': .16,
+    'finishing': .22,
+    'post_up': .2,
+    'open_mid': .09,
+    'open_3': .07,
+    'contest_mid': .09,
+    'contest_3': .07,
+    'playmaking': .03,
+    'ft_shoot': .07
 }
 
 g_weight_defense = {

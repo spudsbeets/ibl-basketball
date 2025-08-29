@@ -10,6 +10,10 @@ entry_draft_rating_spans = {
                 'low': 1,
                 'high': 90
             },
+            'post_up': {
+                'low': 1,
+                'high': 50
+            },
             'open_mid': {
                 'low': 1,
                 'high': 99
@@ -80,6 +84,10 @@ entry_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 99
+            },
+            'post_up': {
+                'low': 1,
+                'high': 60
             },
             'open_mid': {
                 'low': 1,
@@ -152,6 +160,10 @@ entry_draft_rating_spans = {
                 'low': 1,
                 'high': 90
             },
+            'post_up': {
+                'low': 1,
+                'high': 60
+            },
             'open_mid': {
                 'low': 1,
                 'high': 99
@@ -222,6 +234,10 @@ entry_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 95
+            },
+            'post_up': {
+                'low': 1,
+                'high': 65
             },
             'open_mid': {
                 'low': 1,
@@ -296,6 +312,10 @@ entry_draft_rating_spans = {
                 'low': 1,
                 'high': 90
             },
+            'post_up': {
+                'low': 1,
+                'high': 60
+            },
             'open_mid': {
                 'low': 1,
                 'high': 99
@@ -366,6 +386,10 @@ entry_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 99
+            },
+            'post_up': {
+                'low': 1,
+                'high': 65
             },
             'open_mid': {
                 'low': 1,
@@ -438,6 +462,10 @@ entry_draft_rating_spans = {
                 'low': 1,
                 'high': 90
             },
+            'post_up': {
+                'low': 1,
+                'high': 65
+            },
             'open_mid': {
                 'low': 1,
                 'high': 99
@@ -508,6 +536,10 @@ entry_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 95
+            },
+            'post_up': {
+                'low': 1,
+                'high': 70
             },
             'open_mid': {
                 'low': 1,
@@ -582,6 +614,10 @@ entry_draft_rating_spans = {
                 'low': 1,
                 'high': 90
             },
+            'post_up': {
+                'low': 1,
+                'high': 70
+            },
             'open_mid': {
                 'low': 1,
                 'high': 99
@@ -652,6 +688,10 @@ entry_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 90
+            },
+            'post_up': {
+                'low': 1,
+                'high': 75
             },
             'open_mid': {
                 'low': 1,
@@ -724,6 +764,10 @@ entry_draft_rating_spans = {
                 'low': 1,
                 'high': 90
             },
+            'post_up': {
+                'low': 1,
+                'high': 75
+            },
             'open_mid': {
                 'low': 1,
                 'high': 99
@@ -794,6 +838,10 @@ entry_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 95
+            },
+            'post_up': {
+                'low': 1,
+                'high': 80
             },
             'open_mid': {
                 'low': 1,
@@ -868,6 +916,10 @@ entry_draft_rating_spans = {
                 'low': 1,
                 'high': 95
             },
+            'post_up': {
+                'low': 1,
+                'high': 80
+            },
             'open_mid': {
                 'low': 1,
                 'high': 95
@@ -938,6 +990,10 @@ entry_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 95
+            },
+            'post_up': {
+                'low': 1,
+                'high': 90
             },
             'open_mid': {
                 'low': 1,
@@ -1010,6 +1066,10 @@ entry_draft_rating_spans = {
                 'low': 1,
                 'high': 99
             },
+            'post_up': {
+                'low': 1,
+                'high': 90
+            },
             'open_mid': {
                 'low': 1,
                 'high': 90
@@ -1080,6 +1140,10 @@ entry_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 99
+            },
+            'post_up': {
+                'low': 1,
+                'high': 95
             },
             'open_mid': {
                 'low': 1,
@@ -1154,6 +1218,10 @@ entry_draft_rating_spans = {
                 'low': 1,
                 'high': 95
             },
+            'post_up': {
+                'low': 1,
+                'high': 95
+            },
             'open_mid': {
                 'low': 1,
                 'high': 90
@@ -1224,6 +1292,10 @@ entry_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 95
+            },
+            'post_up': {
+                'low': 1,
+                'high': 99
             },
             'open_mid': {
                 'low': 1,
@@ -1296,6 +1368,10 @@ entry_draft_rating_spans = {
                 'low': 1,
                 'high': 99
             },
+            'post_up': {
+                'low': 1,
+                'high': 99
+            },
             'open_mid': {
                 'low': 1,
                 'high': 80
@@ -1364,6 +1440,10 @@ entry_draft_rating_spans = {
                 'high': 99
             },
             'finishing': {
+                'low': 1,
+                'high': 99
+            },
+            'post_up': {
                 'low': 1,
                 'high': 99
             },
@@ -1443,6 +1523,10 @@ normal_draft_rating_spans = {
                 'low': 1,
                 'high': 70
             },
+            'post_up': {
+                'low': 1,
+                'high': 40
+            },
             'open_mid': {
                 'low': 1,
                 'high': 79
@@ -1513,6 +1597,10 @@ normal_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 79
+            },
+            'post_up': {
+                'low': 1,
+                'high': 45
             },
             'open_mid': {
                 'low': 1,
@@ -1585,6 +1673,10 @@ normal_draft_rating_spans = {
                 'low': 1,
                 'high': 70
             },
+            'post_up': {
+                'low': 1,
+                'high': 45
+            },
             'open_mid': {
                 'low': 1,
                 'high': 79
@@ -1655,6 +1747,10 @@ normal_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 75
+            },
+            'post_up': {
+                'low': 1,
+                'high': 50
             },
             'open_mid': {
                 'low': 1,
@@ -1729,6 +1825,10 @@ normal_draft_rating_spans = {
                 'low': 1,
                 'high': 70
             },
+            'post_up': {
+                'low': 1,
+                'high': 45
+            },
             'open_mid': {
                 'low': 1,
                 'high': 79
@@ -1799,6 +1899,10 @@ normal_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 79
+            },
+            'post_up': {
+                'low': 1,
+                'high': 50
             },
             'open_mid': {
                 'low': 1,
@@ -1871,6 +1975,10 @@ normal_draft_rating_spans = {
                 'low': 1,
                 'high': 70
             },
+            'post_up': {
+                'low': 1,
+                'high': 50
+            },
             'open_mid': {
                 'low': 1,
                 'high': 79
@@ -1941,6 +2049,10 @@ normal_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 75
+            },
+            'post_up': {
+                'low': 1,
+                'high': 55
             },
             'open_mid': {
                 'low': 1,
@@ -2015,6 +2127,10 @@ normal_draft_rating_spans = {
                 'low': 1,
                 'high': 70
             },
+            'post_up': {
+                'low': 1,
+                'high': 60
+            },
             'open_mid': {
                 'low': 1,
                 'high': 79
@@ -2085,6 +2201,10 @@ normal_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 70
+            },
+            'post_up': {
+                'low': 1,
+                'high': 65
             },
             'open_mid': {
                 'low': 1,
@@ -2157,6 +2277,10 @@ normal_draft_rating_spans = {
                 'low': 1,
                 'high': 70
             },
+            'post_up': {
+                'low': 1,
+                'high': 65
+            },
             'open_mid': {
                 'low': 1,
                 'high': 79
@@ -2227,6 +2351,10 @@ normal_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 75
+            },
+            'post_up': {
+                'low': 1,
+                'high': 65
             },
             'open_mid': {
                 'low': 1,
@@ -2301,6 +2429,10 @@ normal_draft_rating_spans = {
                 'low': 1,
                 'high': 75
             },
+            'post_up': {
+                'low': 1,
+                'high': 70
+            },
             'open_mid': {
                 'low': 1,
                 'high': 75
@@ -2369,6 +2501,10 @@ normal_draft_rating_spans = {
                 'high': 75
             },
             'finishing': {
+                'low': 1,
+                'high': 75
+            },
+            'post_up': {
                 'low': 1,
                 'high': 75
             },
@@ -2443,6 +2579,10 @@ normal_draft_rating_spans = {
                 'low': 1,
                 'high': 79
             },
+            'post_up': {
+                'low': 1,
+                'high': 75
+            },
             'open_mid': {
                 'low': 1,
                 'high': 70
@@ -2513,6 +2653,10 @@ normal_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 79
+            },
+            'post_up': {
+                'low': 1,
+                'high': 80
             },
             'open_mid': {
                 'low': 1,
@@ -2587,6 +2731,10 @@ normal_draft_rating_spans = {
                 'low': 1,
                 'high': 75
             },
+            'post_up': {
+                'low': 1,
+                'high': 75
+            },
             'open_mid': {
                 'low': 1,
                 'high': 70
@@ -2655,6 +2803,10 @@ normal_draft_rating_spans = {
                 'high': 75
             },
             'finishing': {
+                'low': 1,
+                'high': 75
+            },
+            'post_up': {
                 'low': 1,
                 'high': 75
             },
@@ -2729,6 +2881,10 @@ normal_draft_rating_spans = {
                 'low': 1,
                 'high': 79
             },
+            'post_up': {
+                'low': 1,
+                'high': 80
+            },
             'open_mid': {
                 'low': 1,
                 'high': 60
@@ -2799,6 +2955,10 @@ normal_draft_rating_spans = {
             'finishing': {
                 'low': 1,
                 'high': 79
+            },
+            'post_up': {
+                'low': 1,
+                'high': 80
             },
             'open_mid': {
                 'low': 1,

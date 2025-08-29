@@ -6,7 +6,7 @@ class Player:
 
     def __init__(self,
                  name, height, weight, position, region, salary, age, mercuriality, contentment, character,
-                 o_reb, finishing, open_mid, open_3, contest_mid, contest_3, playmaking, ft_shoot,
+                 o_reb, finishing, post_up, open_mid, open_3, contest_mid, contest_3, playmaking, ft_shoot,
                  d_reb, block, steal, stickiness,
                  awareness, endurance, confidence,
                  speed, strength):
@@ -29,6 +29,7 @@ class Player:
         # Offensive Ratings
         self.o_reb = o_reb
         self.finishing = finishing
+        self.post_up = post_up
         self.open_mid = open_mid
         self.open_3 = open_3
         self.contest_mid = contest_mid
@@ -85,6 +86,7 @@ class Player:
             weight = c_weight_offense
 
         return round((self.o_reb.curr_rating * weight['o_reb']) + (self.finishing.curr_rating * weight['finishing']) + \
+            + (self.post_up.curr_rating * weight['post_up']) + \
             (self.open_mid.curr_rating * weight['open_mid']) + (self.open_3.curr_rating * weight['open_3']) + \
             (self.contest_mid.curr_rating * weight['contest_mid']) + (self.contest_3.curr_rating * weight['contest_3']) + \
             (self.playmaking.curr_rating * weight['playmaking']) + (self.ft_shoot.curr_rating * weight['ft_shoot']))
@@ -133,9 +135,9 @@ class Player:
             return 'creates_jumpers'
         elif self.playmaking.curr_rating > threshold and self.awareness.curr_rating > threshold:
             return 'creates_for_teammates'
-        elif self.finishing.curr_rating > threshold and self.position in ('PG', 'SG', 'SF'):
+        elif self.finishing.curr_rating > threshold and self.position in ('PG', 'SG', 'SF', 'PF'):
             return 'creates_drives'
-        elif self.finishing.curr_rating > threshold and self.position in ('PF', 'C'):
+        elif self.post_up.curr_rating > threshold:
             return 'post_merchant'
         else:
             return 'offensive_dud'

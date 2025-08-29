@@ -155,6 +155,7 @@ class Team:
                 if self.coach.coach_offense.rating > 0 and self.coach.coach_offense.rating <= 40:
                     player.o_reb.curr_rating = max(0, player.o_reb.curr_rating - generate_random_int(0, 5))
                     player.finishing.curr_rating = max(0, player.finishing.curr_rating - generate_random_int(0, 5))
+                    player.post_up.curr_rating = max(0, player.post_up.curr_rating - generate_random_int(0, 5))
                     player.open_mid.curr_rating = max(0, player.open_mid.curr_rating - generate_random_int(0, 5))
                     player.open_3.curr_rating = max(0, player.open_3.curr_rating - generate_random_int(0, 5))
                     player.contest_mid.curr_rating = max(0, player.contest_mid.curr_rating - generate_random_int(0, 5))
@@ -165,6 +166,8 @@ class Team:
                     player.o_reb.curr_rating = max(0, min(99, player.o_reb.curr_rating + o_reb_change))
                     finishing_change = generate_random_int(-2, 2)
                     player.finishing.curr_rating = max(0, min(99, player.finishing.curr_rating + finishing_change))
+                    post_up_change = generate_random_int(-2, 2)
+                    player.post_up.curr_rating = max(0, min(99, player.post_up.curr_rating + post_up_change))
                     open_mid_change = generate_random_int(-2, 2)
                     player.open_mid.curr_rating = max(0, min(99, player.open_mid.curr_rating + open_mid_change))
                     open_3_change = generate_random_int(-2, 2)
@@ -178,6 +181,7 @@ class Team:
                 else:
                     player.o_reb.curr_rating = min(99, player.o_reb.curr_rating + generate_random_int(0, 5))
                     player.finishing.curr_rating = min(99, player.finishing.curr_rating + generate_random_int(0, 5))
+                    player.post_up.curr_rating = min(99, player.post_up.curr_rating + generate_random_int(0, 5))
                     player.open_mid.curr_rating = min(99, player.open_mid.curr_rating + generate_random_int(0, 5))
                     player.open_3.curr_rating = min(99, player.open_3.curr_rating + generate_random_int(0, 5))
                     player.contest_mid.curr_rating = min(99, player.contest_mid.curr_rating + generate_random_int(0, 5))
