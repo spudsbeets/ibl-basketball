@@ -23,3 +23,9 @@ def get_sorted_roster_by_d_reb(roster):
 
 def get_sorted_roster_by_o_reb(roster):
     return sorted(roster, key=lambda p: p.o_reb.curr_rating, reverse=True)
+
+def get_sorted_roster_by_open_3(roster):
+    return sorted(roster, key=lambda p: p.open_3.curr_rating, reverse=True)
+
+def get_sorted_roster_by_open_mid(roster):
+    return sorted(roster, key=lambda p: p.open_mid.curr_rating, reverse=True)

@@ -429,6 +429,36 @@ class Game():
         else:
             return sorted_offense[4]
 
+    def _determine_secondary_playmaker(self, primary_playmaker, offense_on_court):
+        """
+        Determines the secondary playmaker on a non-iso play.
+        """
+        available_offense = [p for p in offense_on_court if p != primary_playmaker]
+
+        firstRandomNum = generate_random_int(0, 100)
+
+        if firstRandomNum >= 20:
+            sorted_offense = get_sorted_roster_by_o_overall(available_offense)
+        elif firstRandomNum >= 40:
+            sorted_offense = get_sorted_roster_by_awareness(available_offense)
+        elif firstRandomNum >= 60:
+            sorted_offense = get_sorted_roster_by_playmaking(available_offense)
+        elif firstRandomNum >= 85:
+            sorted_offense = get_sorted_roster_by_open_3(available_offense)
+        else:
+            sorted_offense = get_sorted_roster_by_open_mid(available_offense)
+
+        secondRandomNum = generate_random_int(0, 100)
+
+        if secondRandomNum < 40:
+            return sorted_offense[0]
+        elif secondRandomNum < 70:
+            return sorted_offense[1]
+        elif secondRandomNum < 90:
+            return sorted_offense[2]
+        else:
+            return sorted_offense[3]
+
     def _determine_primary_offense_rebounder(self, offense_on_court):
         """
         Determines which offensive player is gunning for an offensive rebound on a given play.
@@ -467,7 +497,7 @@ class Game():
         else:
             return sorted_defense[4]
 
-    def _determine_matchups(self, offense_on_court, defense_on_court, defensive_scheme):
+    def _determine_matchups(self, offense_on_court, defense_on_court, defensive_scheme='MAN'):
         """
         Returns a dictionary that matches each player up to their most sensible defensive counterpart.
         """
@@ -1065,6 +1095,119 @@ class Game():
         # 7) Update stats, points, possession, stamina, substitutes where necessary
         else:
             print(play_type)
+            # Determine (1)
+            # Low result = reach-in foul, High result = steal
+            steal_threshold = {'lo': generate_random_int(5, 8), 'hi': generate_random_int(91, 95)}
+            # MODIFIERS
+            self._non_binary_adjust_thresholds(primary_defender.steal.curr_rating, steal_threshold, 6, 'defense')
+            self._non_binary_adjust_thresholds(primary_playmaker.awareness.curr_rating, steal_threshold, 6, 'offense')
+            # Success Roll
+            steal_success = generate_random_int(0, 100)
+            if steal_success > steal_threshold['hi']:
+                steal_OB = generate_random_int(0, 100)
+                # Base 30% chance steal attempt goes OB
+                if steal_OB > 30:
+                    poss_change = self._record_a_steal(primary_defender, primary_playmaker, defense, offense)
+                else:
+                    stoppage = True
+                    stoppage_type = 'OB'
+                    print(f"Ball knocked out of bounds by {primary_defender.name}({defense_team.nickname}) from {primary_playmaker.name}({offense_team.nickname}).")
+
+            elif steal_success < steal_threshold['lo']:
+                stoppage = True
+                primary_defender.game_stats['fouls'] += 1
+                defense_team.fouls_in_q += 1
+                print(f"Reach-in foul committed by {primary_defender.name}({defense_team.nickname}) on {primary_playmaker.name}({offense_team.nickname}).")
+                # If offense is in the bonus take FTS
+                if defense_team.fouls_in_q > 4 or (defense_team.fouls_in_q > 1 and self.curr_quarter == 'OT'):
+                    stoppage_type = self._shoot_fts(primary_playmaker, 2, offense, offense_team, offense_on_court, defense_on_court)
+                    poss_change = True
+                else:
+                    stoppage_type = 'OB'
+                    print(f"Ball taken out of bounds by {offense_team.nickname}.")
+            else:
+                # Determine (2)
+                # Determine number of passes for pick_n_rolls
+                pass_count = 1
+                if play_type == 'pick_n_roll':
+                    zero_or_mult_pass_threshold = generate_random_int(65, 80)
+                    zero_or_mult_pass_success = generate_random_int(0, 100)
+                    if zero_or_mult_pass_success > zero_or_mult_pass_threshold:
+                        zero_or_two_roll = generate_random_int(0, 100)
+                        if zero_or_two_roll > 50:
+                            pass_count = 0
+                        else:
+                            pass_count = 2
+                # If passes occur, determine (3)
+                on_ball = primary_playmaker
+                on_ball_defense = primary_defender
+                if pass_count > 0:
+                    secondary_playmaker = self._determine_secondary_playmaker(primary_playmaker, offense_on_court)
+                    matchup_dict = self._determine_matchups(offense_on_court, defense_on_court)
+                    secondary_defender = matchup_dict[primary_playmaker.name]
+                    off_ball = secondary_playmaker
+                    off_ball_defense = secondary_defender
+                # Determine is pass(es) are successful
+                for _ in range(pass_count):
+                    # Low result = Successful pass, High result = Steal
+                    initial_pass_threshold = generate_random_int(92, 100)
+                    # MODIFIERS
+                    offense_mod_pass_threshold = self._binary_adjust_threshold(on_ball.playmaking.curr_rating, initial_pass_threshold, 12, 'offense')
+                    defense_mod_pass_threshold = self._binary_adjust_threshold(on_ball_defense.stickiness.curr_rating, offense_mod_pass_threshold, 9, 'defense')
+                    final_mod_pass_threshold = self._binary_adjust_threshold(off_ball.awareness.curr_rating, defense_mod_pass_threshold, 7, 'offense')
+                    pass_threshold = self._binary_adjust_threshold(off_ball_defense.steal.curr_rating, final_mod_pass_threshold, 10, 'defense')
+                    # Success Roll
+                    pass_success = generate_random_int(0, 100)
+                    if pass_success > pass_threshold:
+                        steal_OB = generate_random_int(0, 100)
+                        # 30% chance steal attempt goes OB
+                        if steal_OB > 30:
+                            poss_change = self._record_a_steal(off_ball_defense, on_ball, defense, offense)
+                        else:
+                            stoppage = True
+                            stoppage_type = 'OB'
+                            print(f"Ball knocked out of bounds by {off_ball_defense.name}({defense_team.nickname}) from {on_ball.name}({offense_team.nickname}).")
+                    else:
+                        (on_ball, off_ball, on_ball_defense, off_ball_defense) = (off_ball, on_ball, off_ball_defense, on_ball_defense)
+                # Determine (4)
+                # Low result = Finish at basket, Mid result = Mid range, High result = 3 pointer
+                if play_type == 'drive_n_pass' or pass_count == 1:
+                    shot_type_threshold = {'lo': generate_random_int(10, 12), 'hi': generate_random_int(50, 56)}
+                # 'find_cutter', pass_count == 0 or 2
+                else:
+                    shot_type_threshold = {'lo': generate_random_int(61, 73), 'hi': generate_random_int(90, 92)}
+                shot_type_determiner = generate_random_int(0, 100)
+                if shot_type_determiner < shot_type_threshold['lo']:
+                    shot_type = 'finish_at_basket'
+                elif shot_type_determiner <= shot_type_threshold['hi']:
+                    shot_type = 'mid_range'
+                else:
+                    shot_type = 'three_pointer'
+                # Determine (5)
+                # Determine if shot is open or contested if it is not a finish at bucket
+                shot_contest = 'contested'
+                if shot_type != 'finish_at_basket':
+                    # Low result = Open shot, High result = Contested Shot
+                    if shot_type == 'three_pointer':
+                        initial_open_threshold = generate_random_int(42, 61)
+                    else:
+                        initial_open_threshold = generate_random_int(48, 70)
+                    # MODIFIERS
+                    if pass_count == 1:
+                        initial_open_threshold += generate_random_int(0, 5)
+                    elif pass_count == 2:
+                        initial_open_threshold += generate_random_int(5, 10)
+                    offense_mod_open_threshold = self._binary_adjust_threshold(on_ball.playmaking.curr_rating, initial_open_threshold, 8, 'offense')
+                    open_threshold = self._binary_adjust_threshold(on_ball_defense.stickiness.curr_rating, offense_mod_open_threshold, 8, 'defense')
+                    # Success roll
+                    open_success = generate_random_int(0, 100)
+                    if open_success < open_threshold:
+                        shot_contest = 'open'
+                if shot_contest == 'open':
+                    print(f"open {shot_type}!")
+                else:
+                    print(f"conteseted {shot_type}!")
+
 
         # Happens after any result
         self._decrease_stamina_onCourt(primary_playmaker, primary_defender, secondary_playmaker, secondary_defender,
@@ -1083,9 +1226,6 @@ class Game():
         Simulates a play.
         """
         # SETUP
-
-        # Default all defensive schemes to man, will be more involved later on
-        defensive_scheme = 'MAN'
 
         if self.curr_poss == 'home_team':
             offense_team = self.home_team
@@ -1110,7 +1250,7 @@ class Game():
         primary_playmaker = self._determine_primary_playmaker(offense_on_court)
 
         # Determine primary defender (or Zone --> composite of a few nearby players)
-        matchup_dict = self._determine_matchups(offense_on_court, defense_on_court, defensive_scheme)
+        matchup_dict = self._determine_matchups(offense_on_court, defense_on_court)
         primary_defender = matchup_dict[primary_playmaker.name]
 
         # Determine attempted play
