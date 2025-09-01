@@ -25,6 +25,7 @@ generate_entry_draft_class()
 #        'character': player.character,
 #        'o_reb': player.o_reb.curr_rating,
 #        'finishing': player.finishing.curr_rating,
+#        'post_up': player.post_up.curr_rating,
 #        'open_mid': player.open_mid.curr_rating,
 #        'open_3': player.open_3.curr_rating,
 #        'contest_mid': player.contest_mid.curr_rating,

@@ -147,6 +147,8 @@ class Game():
         """
         stat_block[curr_quarter]['home_team']['fouls'] += home_team.fouls_in_q
         stat_block[curr_quarter]['away_team']['fouls'] += away_team.fouls_in_q
+        stat_block['Full Game']['home_team']['fouls'] += home_team.fouls_in_q
+        stat_block['Full Game']['away_team']['fouls'] += away_team.fouls_in_q
         stat_block[curr_quarter]['home_team']['points'] += home_team.points_in_q
         stat_block[curr_quarter]['away_team']['points'] += away_team.points_in_q
         stat_block['Full Game']['home_team']['points'] += home_team.points_in_q
@@ -157,6 +159,46 @@ class Game():
         away_team.fouls_in_q = 0
         home_team.points_in_q = 0
         away_team.points_in_q = 0
+
+    def _print_end_of_game_stats(self, ot_count):
+        """
+        Prints end of game stats.
+        """
+        print("")
+        print('FINAL SCORE')
+        print(f"{self.home_team.nickname}: {self.home_team.points_total}")
+        print(f"{self.away_team.nickname}: {self.away_team.points_total}")
+        # Show Box Score
+        print("")
+        print(f"{self.home_team.nickname} TEAM STATS:")
+        print(f"Q1: {self.game_stat_block[1]['home_team']}")
+        print(f"Q2: {self.game_stat_block[2]['home_team']}")
+        print(f"Q3: {self.game_stat_block[3]['home_team']}")
+        print(f"Q4: {self.game_stat_block[4]['home_team']}")
+        if ot_count > 1:
+            print(f"OT: {self.game_stat_block['OT']['home_team']}")
+        print(f"FULL GAME: {self.game_stat_block['Full Game']['home_team']}")
+        print("")
+        print(f"{self.away_team.nickname} TEAM STATS:")
+        print(f"Q1: {self.game_stat_block[1]['away_team']}")
+        print(f"Q2: {self.game_stat_block[2]['away_team']}")
+        print(f"Q3: {self.game_stat_block[3]['away_team']}")
+        print(f"Q4: {self.game_stat_block[4]['away_team']}")
+        if ot_count > 1:
+            print(f"OT: {self.game_stat_block['OT']['away_team']}")
+        print(f"FULL GAME: {self.game_stat_block['Full Game']['away_team']}")
+        print("")
+        print(f"PLAYER STATS {self.home_team.nickname}:")
+        for player in self.home_team.roster:
+            if player.game_stats['plays'] != 0:
+                print(f"NAME: {player.name}")
+                print(f"MINUTES: {player.game_stats['minutes']} POINTS: {player.game_stats['points']}, PLAYS: {player.game_stats['plays']}, FG ATTEMPTS: {player.game_stats['2fg_taken']}, FG MADE: {player.game_stats['2fg_made']}, 2FG%: {round(player.game_stats['2fg_made'] / player.game_stats['2fg_taken'] * 100) if player.game_stats['2fg_taken'] > 0 else 0}%, 3PT ATTEMPTS: {player.game_stats['3fg_taken']}, 3PT MADE: {player.game_stats['3fg_made']}, 3PT%: {round(player.game_stats['3fg_made'] / player.game_stats['3fg_taken'] * 100) if player.game_stats['3fg_taken'] > 0 else 0}%, FT ATTEMPTS: {player.game_stats['ft_taken']}, FT MADE: {player.game_stats['ft_made']}, FT%: {round(player.game_stats['ft_made'] / player.game_stats['ft_taken'] * 100) if player.game_stats['ft_taken'] > 0 else 0}%, REBOUNDS: {player.game_stats['rebounds']}, OFFENSIVE REBOUNDS: {player.game_stats['offensive_rebounds']}, DEFENSIVE REBOUNDS: {player.game_stats['defensive_rebounds']}, ASSISTS: {player.game_stats['assists']}, STEALS: {player.game_stats['steals']}, BLOCKS: {player.game_stats['blocks']}, TURNOVERS: {player.game_stats['turnovers']}, FOULS: {player.game_stats['fouls']}, +/-: {player.game_stats['+/-']}")
+        print("")
+        print(f"PLAYER STATS {self.away_team.nickname}:")
+        for player in self.away_team.roster:
+            if player.game_stats['plays'] != 0:
+                print(f"NAME: {player.name}")
+                print(f"MINUTES: {player.game_stats['minutes']} POINTS: {player.game_stats['points']}, PLAYS: {player.game_stats['plays']}, FG ATTEMPTS: {player.game_stats['2fg_taken']}, FG MADE: {player.game_stats['2fg_made']}, 2FG%: {round(player.game_stats['2fg_made'] / player.game_stats['2fg_taken'] * 100) if player.game_stats['2fg_taken'] > 0 else 0}%, 3PT ATTEMPTS: {player.game_stats['3fg_taken']}, 3PT MADE: {player.game_stats['3fg_made']}, 3PT%: {round(player.game_stats['3fg_made'] / player.game_stats['3fg_taken'] * 100) if player.game_stats['3fg_taken'] > 0 else 0}%, FT ATTEMPTS: {player.game_stats['ft_taken']}, FT MADE: {player.game_stats['ft_made']}, FT%: {round(player.game_stats['ft_made'] / player.game_stats['ft_taken'] * 100) if player.game_stats['ft_taken'] > 0 else 0}%, REBOUNDS: {player.game_stats['rebounds']}, OFFENSIVE REBOUNDS: {player.game_stats['offensive_rebounds']}, DEFENSIVE REBOUNDS: {player.game_stats['defensive_rebounds']}, ASSISTS: {player.game_stats['assists']}, STEALS: {player.game_stats['steals']}, BLOCKS: {player.game_stats['blocks']}, TURNOVERS: {player.game_stats['turnovers']}, FOULS: {player.game_stats['fouls']}, +/-: {player.game_stats['+/-']}")
 
     # THRESHOLD ADJUSTERS
     def _non_binary_adjust_thresholds(self, rating, threshold_dict, max_change, d_or_o):
@@ -558,6 +600,8 @@ class Game():
         primary_playmaker.game_stats['points'] += made_count
         self.game_stat_block[self.curr_quarter][offense]['ft_taken'] += 2
         self.game_stat_block[self.curr_quarter][offense]['ft_made'] += made_count
+        self.game_stat_block['Full Game'][offense]['ft_taken'] += 2
+        self.game_stat_block['Full Game'][offense]['ft_made'] += made_count
         self._update_plus_minus(offense_on_court, defense_on_court, made_count)
         offense_team.points_in_q += made_count
         print(f"Free throws awarded to {primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}). {primary_playmaker.name} makes {made_count} / {attempts} fts.")
@@ -587,6 +631,8 @@ class Game():
             primary_o_reb.game_stats['offensive_rebounds'] += 1
             self.game_stat_block[self.curr_quarter][offense]['rebounds'] += 1
             self.game_stat_block[self.curr_quarter][offense]['offensive_rebounds'] += 1
+            self.game_stat_block['Full Game'][offense]['rebounds'] += 1
+            self.game_stat_block['Full Game'][offense]['offensive_rebounds'] += 1
             poss_change = False
             print(f"Offensive rebound secured by {primary_o_reb.name}({primary_o_reb.position}).")
         else:
@@ -594,6 +640,8 @@ class Game():
             primary_d_reb.game_stats['defensive_rebounds'] += 1
             self.game_stat_block[self.curr_quarter][defense]['rebounds'] += 1
             self.game_stat_block[self.curr_quarter][defense]['defensive_rebounds'] += 1
+            self.game_stat_block['Full Game'][defense]['rebounds'] += 1
+            self.game_stat_block['Full Game'][defense]['defensive_rebounds'] += 1
             poss_change = True
             print(f"Defensive rebound secured by {primary_d_reb.name} ({primary_d_reb.position}).")
         return (poss_change, primary_o_reb, primary_d_reb)
@@ -607,6 +655,8 @@ class Game():
         primary_playmaker.game_stats['points'] += 3
         self.game_stat_block[self.curr_quarter][offense]['3fg_taken'] += 1
         self.game_stat_block[self.curr_quarter][offense]['3fg_made'] += 1
+        self.game_stat_block['Full Game'][offense]['3fg_taken'] += 1
+        self.game_stat_block['Full Game'][offense]['3fg_made'] += 1
         offense_team.points_in_q += 3
         self._update_plus_minus(offense_on_court, defense_on_court, 3)
         print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) made open 3 point basket.")
@@ -621,6 +671,8 @@ class Game():
         primary_playmaker.game_stats['points'] += 2
         self.game_stat_block[self.curr_quarter][offense]['2fg_taken'] += 1
         self.game_stat_block[self.curr_quarter][offense]['2fg_made'] += 1
+        self.game_stat_block['Full Game'][offense]['2fg_taken'] += 1
+        self.game_stat_block['Full Game'][offense]['2fg_made'] += 1
         offense_team.points_in_q += 2
         self._update_plus_minus(offense_on_court, defense_on_court, 2)
         print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) made open mid-range basket.")
@@ -635,6 +687,8 @@ class Game():
         primary_playmaker.game_stats['points'] += 2
         self.game_stat_block[self.curr_quarter][offense]['2fg_taken'] += 1
         self.game_stat_block[self.curr_quarter][offense]['2fg_made'] += 1
+        self.game_stat_block['Full Game'][offense]['2fg_taken'] += 1
+        self.game_stat_block['Full Game'][offense]['2fg_made'] += 1
         offense_team.points_in_q += 2
         self._update_plus_minus(offense_on_court, defense_on_court, 2)
         print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) made open layup.")
@@ -649,10 +703,42 @@ class Game():
         primary_playmaker.game_stats['points'] += 2
         self.game_stat_block[self.curr_quarter][offense]['2fg_taken'] += 1
         self.game_stat_block[self.curr_quarter][offense]['2fg_made'] += 1
+        self.game_stat_block['Full Game'][offense]['2fg_taken'] += 1
+        self.game_stat_block['Full Game'][offense]['2fg_made'] += 1
         offense_team.points_in_q += 2
         self._update_plus_minus(offense_on_court, defense_on_court, 2)
         print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) made a dunk!")
         return True
+
+    def _miss_a_three(self, primary_playmaker, offense_team, offense, shot_type):
+        """
+        Records stats for a missed 3 pointer.
+        """
+        primary_playmaker.game_stats['3fg_taken'] += 1
+        self.game_stat_block[self.curr_quarter][offense]['3fg_taken'] += 1
+        self.game_stat_block['Full Game'][offense]['3fg_taken'] += 1
+        if shot_type == 'open':
+            print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed an open 3 point basket.")
+        # shot_type == 'contested'
+        else:
+            print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed a contested 3 point basket.")
+
+    def _miss_a_two(self, primary_playmaker, offense_team, offense, shot_type):
+        """
+        Records stats for a missed 2 pointer.
+        """
+        primary_playmaker.game_stats['2fg_taken'] += 1
+        self.game_stat_block[self.curr_quarter][offense]['2fg_taken'] += 1
+        self.game_stat_block['Full Game'][offense]['2fg_taken'] += 1
+        if shot_type == 'layup':
+            print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed a layup.")
+        elif shot_type == 'mid-range-open':
+            print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed an open mid-range basket.")
+        elif shot_type == 'post-up':
+            print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed a post-up attempt.")
+        # shot_type == 'mid-range-contested'
+        else:
+            print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed a contested mid-range basket.")
 
     def _record_a_steal(self, primary_defender, primary_playmaker, defense, offense):
         """
@@ -662,6 +748,8 @@ class Game():
         primary_playmaker.game_stats['turnovers'] += 1
         self.game_stat_block[self.curr_quarter][defense]['steals'] += 1
         self.game_stat_block[self.curr_quarter][offense]['turnovers'] += 1
+        self.game_stat_block['Full Game'][defense]['steals'] += 1
+        self.game_stat_block['Full Game'][offense]['turnovers'] += 1
         print(f"Ball stolen from {primary_playmaker.name} by {primary_defender.name}({primary_defender.position}).")
         return True
 
@@ -675,6 +763,7 @@ class Game():
 
         primary_defender.game_stats['blocks'] += 1
         self.game_stat_block[self.curr_quarter][defense]['blocks'] += 1
+        self.game_stat_block['Full Game'][defense]['blocks'] += 1
         print(f"Shot blocked by {primary_defender.name}({primary_defender.position}, {defense_team.nickname}).")
         # Low result = Offense gets ball back (OB or no), High result = Defense gets ball back
         possession_acquired_threshold = generate_random_int(35, 46)
@@ -697,6 +786,26 @@ class Game():
             poss_change = True
             print(f"Ball recovered by {defense_team.nickname} off block.")
         return (stoppage, stoppage_type, poss_change)
+
+    def _record_an_assist(self, off_ball, offense):
+        """
+        Records stats for an assist.
+        """
+        self.game_stat_block[self.curr_quarter][offense]['assists'] += 1
+        self.game_stat_block['Full Game'][offense]['assists'] += 1
+        off_ball.game_stats['assists'] += 1
+
+    def _record_offensive_foul(self, primary_playmaker, primary_defender, offense, offense_team, defense_team):
+        """
+        Records stats for an offensive foul.
+        """
+        primary_playmaker.game_stats['fouls'] += 1
+        primary_playmaker.game_stats['turnovers'] += 1
+        self.game_stat_block[self.curr_quarter][offense]['turnovers'] += 1
+        self.game_stat_block['Full Game'][offense]['turnovers'] += 1
+        offense_team.fouls_in_q += 1
+        print(f"Offensive foul committed by {primary_playmaker.name}({offense_team.nickname}) on {primary_defender.name}({defense_team.nickname}).")
+        return (True, True, 'OB')
 
     def _determine_play_outcome(self, primary_playmaker, primary_defender, play_type,
                                 offense_team, defense_team, offense_on_court, defense_on_court,
@@ -819,9 +928,9 @@ class Game():
                     # Determine (4)
                     else:
                         if play_type == 'create_3':
-                            print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed an open 3 point basket.")
+                            self._miss_a_three(primary_playmaker, offense_team, offense, 'open')
                         else:
-                            print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed an open mid-range basket.")
+                            self._miss_a_two(primary_playmaker, offense_team, offense, 'mid-range-open')
                         # Low result = Swat OB (determine off whom), High result = Foul (determine on whom)
                         swatOB_or_foul_threshold = {'lo': generate_random_int(6, 9), 'hi': generate_random_int(93, 96)}
                         # NO MODIFIERS (random result)
@@ -892,7 +1001,6 @@ class Game():
                             stoppage_type = self._shoot_fts(primary_playmaker, 2, offense, offense_team, offense_on_court, defense_on_court)
                     elif block_or_shooting_foul_success > block_or_shooting_foul_threshold['hi']:
                         (stoppage, stoppage_type, poss_change) = self._record_a_block(primary_defender, defense, defense_team, offense_team)
-
                     else:
                         if play_type == 'create_3':
                             initial_contest_threshold = generate_random_int(20, 33)
@@ -913,9 +1021,9 @@ class Game():
                         # Determine (4)
                         else:
                             if play_type == 'create_3':
-                                print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed a contested 3 point basket.")
+                                self._miss_a_three(primary_playmaker, offense_team, offense, 'contested')
                             else:
-                                print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed a contested mid-range basket.")
+                                self._miss_a_two(primary_playmaker, offense_team, offense, 'mid-range-contested')
                             # Low result = Swat OB (determine off whom), High result = Foul (determine on whom)
                             swatOB_or_foul_threshold = {'lo': generate_random_int(6, 9), 'hi': generate_random_int(93, 96)}
                             # NO MODIFIERS (random result)
@@ -971,12 +1079,7 @@ class Game():
                 # Success Roll
                 offensive_foul_success = generate_random_int(0, 100)
                 if offensive_foul_success > offensive_foul_threshold:
-                    primary_playmaker.game_stats['fouls'] += 1
-                    offense_team.fouls_in_q += 1
-                    stoppage = True
-                    poss_change = True
-                    stoppage_type = 'OB'
-                    print(f"Offensive foul committed by {primary_playmaker.name}({offense_team.nickname}) on {primary_defender.name}({defense_team.nickname}).")
+                    (stoppage, poss_change, stoppage_type) = self._record_offensive_foul(primary_playmaker, primary_defender, offense, offense_team, defense_team)
                 # Low result = Shooting Foul, High result = Block
                 block_or_shooting_foul_threshold = {'lo': generate_random_int(10, 15), 'hi': generate_random_int(80, 85)}
                 # MODIFIERS
@@ -1014,9 +1117,9 @@ class Game():
                     # Determine (4)
                     else:
                         if play_type == 'iso_drive':
-                            print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed a layup.")
+                            self._miss_a_two(primary_playmaker, offense_team, offense, 'layup')
                         else:
-                            print(f"{primary_playmaker.name}({primary_playmaker.position}, {offense_team.nickname}) missed a post-up attempt.")
+                            self._miss_a_two(primary_playmaker, offense_team, offense, 'post-up')
                         # Low result = Swat OB (determine off whom), High result = Foul (determine on whom)
                         swatOB_or_foul_threshold = {'lo': generate_random_int(6, 9), 'hi': generate_random_int(93, 96)}
                         # NO MODIFIERS (random result)
@@ -1217,8 +1320,7 @@ class Game():
                     # If made
                     if open_success < open_threshold:
                         if pass_count > 0:
-                            self.game_stat_block[self.curr_quarter][offense]['assists'] += 1
-                            off_ball.game_stats['assists'] += 1
+                            self._record_an_assist(off_ball, offense)
                         if shot_type == 'three_pointer':
                             poss_change = self._make_a_three(on_ball, offense, offense_team, offense_on_court, defense_on_court)
                         else:
@@ -1227,9 +1329,9 @@ class Game():
                     # Determine (6)
                     else:
                         if shot_type == 'three_pointer':
-                            print(f"{on_ball.name}({on_ball.position}, {offense_team.nickname}) missed an open 3 point basket.")
+                            self._miss_a_three(on_ball, offense_team, offense, 'open')
                         else:
-                            print(f"{on_ball.name}({on_ball.position}, {offense_team.nickname}) missed an open mid-range basket.")
+                            self._miss_a_two(on_ball, offense_team, offense, 'mid-range-open')
                         # Low result = Swat OB (determine off whom), High result = Foul (determine on whom)
                         swatOB_or_foul_threshold = {'lo': generate_random_int(6, 9), 'hi': generate_random_int(93, 96)}
                         # NO MODIFIERS (random result)
@@ -1285,12 +1387,7 @@ class Game():
                         # Success Roll
                         offensive_foul_success = generate_random_int(0, 100)
                         if offensive_foul_success > offensive_foul_threshold:
-                            on_ball.game_stats['fouls'] += 1
-                            offense_team.fouls_in_q += 1
-                            stoppage = True
-                            poss_change = True
-                            stoppage_type = 'OB'
-                            print(f"Offensive foul committed by {on_ball.name}({offense_team.nickname}) on {on_ball_defense.name}({defense_team.nickname}).")
+                            (stoppage, poss_change, stoppage_type) = self._record_offensive_foul(on_ball, on_ball_defense, offense, offense_team, defense_team)
                     if not poss_change:
                         # Low result = Shooting Foul, High result = Block
                         if shot_type == 'finish_at_basket':
@@ -1328,8 +1425,7 @@ class Game():
                             # If made
                             if shot_success < shot_threshold:
                                 if pass_count > 0:
-                                    self.game_stat_block[self.curr_quarter][offense]['assists'] += 1
-                                    off_ball.game_stats['assists'] += 1
+                                    self._record_an_assist(off_ball, offense)
                                 if shot_type == 'finish_at_basket':
                                     dunk_or_layup = generate_random_int(0, 100)
                                     if dunk_or_layup < 25:
@@ -1344,11 +1440,11 @@ class Game():
                             # Determine (6)
                             else:
                                 if shot_type == 'finish_at_basket':
-                                    print(f"{on_ball.name}({on_ball.position}, {offense_team.nickname}) missed a layup.")
+                                    self._miss_a_two(on_ball, offense_team, offense, 'layup')
                                 elif shot_type == 'three_pointer':
-                                    print(f"{on_ball.name}({on_ball.position}, {offense_team.nickname}) missed a contested three point basket.")
+                                    self._miss_a_three(on_ball, offense_team, offense, 'contested')
                                 else:
-                                    print(f"{on_ball.name}({on_ball.position}, {offense_team.nickname}) missed a contested mid-range bucket.")
+                                    self._miss_a_two(on_ball, offense_team, offense, 'mid-range-contested')
                                 # Low result = Swat OB (determine off whom), High result = Foul (determine on whom)
                                 swatOB_or_foul_threshold = {'lo': generate_random_int(6, 9), 'hi': generate_random_int(93, 96)}
                                 # NO MODIFIERS (random result)
@@ -1457,7 +1553,7 @@ class Game():
         self._determine_tipoff()
         self._set_onCourt()
         # Print out rosters with basic ratings
-        print({'TEAM': self.home_team.nickname})
+        print({'TEAM STARTERS': self.home_team.nickname})
         for player in self.home_onCourt:
             print({
                 'name': player.name,
@@ -1466,8 +1562,26 @@ class Game():
                 'o_ovr': player.o_ovr,
                 'd_ovr': player.d_ovr
             })
-        print({'TEAM': self.away_team.nickname})
+        print({'TEAM BENCH': self.home_team.nickname})
+        for player in self.home_onBench:
+            print({
+                'name': player.name,
+                'position': player.position,
+                'overall': player.overall,
+                'o_ovr': player.o_ovr,
+                'd_ovr': player.d_ovr
+            })
+        print({'TEAM STARTERS': self.away_team.nickname})
         for player in self.away_onCourt:
+            print({
+                'name': player.name,
+                'position': player.position,
+                'overall': player.overall,
+                'o_ovr': player.o_ovr,
+                'd_ovr': player.d_ovr
+            })
+        print({'TEAM BENCH': self.away_team.nickname})
+        for player in self.away_onBench:
             print({
                 'name': player.name,
                 'position': player.position,
@@ -1532,14 +1646,8 @@ class Game():
             self.OT_plays_current = 0
             ot_count += 1
         print('END GAME')
-        print('FINAL SCORE')
-        print(f"{self.home_team.nickname}: {self.home_team.points_total}")
-        print(f"{self.away_team.nickname}: {self.away_team.points_total}")
-        # Show Box Score
-        print(f"{self.home_team.nickname} TEAM STATS:")
-        print(self.game_stat_block['Full Game']['home_team'])
-        print(f"{self.away_team.nickname} TEAM STATS:")
-        print(self.game_stat_block['Full Game']['away_team'])
+        # Print End of game stats
+        self._print_end_of_game_stats(ot_count)
         # Log player stats and game stats
 
         # Reset starters, stamina, and trackers for next game

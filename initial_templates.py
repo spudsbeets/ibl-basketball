@@ -1,4 +1,5 @@
-individual_stat_block_overalls = {
+def make_individual_stat_block_overalls():
+    return {
     'games_played': 0,
     'minutes': {
         'total': 0,
@@ -52,7 +53,8 @@ individual_stat_block_overalls = {
     '+/-': 0
 }
 
-individual_stat_block_game = {
+def make_individual_stat_block_game():
+    return {
     'minutes': 0,
     'points': 0,
     'plays': 0,
@@ -73,7 +75,8 @@ individual_stat_block_game = {
     '+/-': 0
 }
 
-game_stat_block = {
+def make_game_stat_block():
+    return {
     'home_team': {
         'points': 0,
         '2fg_taken': 0,
@@ -111,15 +114,16 @@ game_stat_block = {
 }
 
 full_game_stat_block = {
-    1: game_stat_block,
-    2: game_stat_block,
-    3: game_stat_block,
-    4: game_stat_block,
-    'OT': game_stat_block,
-    'Full Game': game_stat_block
+    1: make_game_stat_block(),
+    2: make_game_stat_block(),
+    3: make_game_stat_block(),
+    4: make_game_stat_block(),
+    'OT': make_game_stat_block(),
+    'Full Game': make_game_stat_block()
 }
 
-team_totals = {
+def make_team_totals():
+    return {
     'games_played': 0,
     'points': 0,
     '2fg_taken': 0,

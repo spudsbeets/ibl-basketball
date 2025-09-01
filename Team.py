@@ -28,7 +28,7 @@ class Team:
         self.accolades = accolades if accolades is not None else {'2030': None}
         self.wins = 0,
         self.losses = 0,
-        self.total_stats = team_totals
+        self.total_stats = make_team_totals()
         self.average_stats = self._calculate_average_stats()
         self.individual_stats_season = {}
         self.individual_stats_career = {}

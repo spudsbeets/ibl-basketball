@@ -61,9 +61,9 @@ class Player:
         self.amateur_stats = self._calculate_amateur_stats()
 
         # Stats Tracker
-        self.game_stats = individual_stat_block_game
-        self.season_stats = individual_stat_block_overalls
-        self.career_stats = individual_stat_block_overalls
+        self.game_stats = make_individual_stat_block_game()
+        self.season_stats = make_individual_stat_block_overalls()
+        self.career_stats = make_individual_stat_block_overalls()
         self.stats_archive = {}
 
         # Initializes stamina meter to be changed mid-game
@@ -110,7 +110,7 @@ class Player:
         return round((self.o_ovr * .5) + (self.d_ovr * .4) + (self.intangibles_ovr * .1))
 
     def _calculate_amateur_stats(self):
-        amateur_stats = individual_stat_block_overalls
+        amateur_stats = make_individual_stat_block_overalls()
         return amateur_stats
 
     def _determine_offensive_archetype(self):
@@ -236,9 +236,9 @@ class Player:
             self.season_stats['+/-']['total'] += self.game_stats['+/-']
             self.career_stats['+/-']['total'] += self.career_stats['+/-']
 
-        self.game_stats = individual_stat_block_game
+        self.game_stats = make_individual_stat_block_game()
 
     def next_season(self):
         self.stats_archive[str(self.curr_year)] = self.season_stats
-        self.season_stats = individual_stat_block_overalls
+        self.season_stats = make_individual_stat_block_overalls()
         self.curr_year += 1
