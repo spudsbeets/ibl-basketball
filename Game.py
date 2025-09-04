@@ -70,9 +70,9 @@ class Game():
         Stamina increase whenever there is a stoppage in play.
         """
         stamina_dict = {
-            'timeout': {'lo': 12, 'hi': 18},
-            'OB': {'lo': 2, 'hi': 4},
-            'fts': {'lo': 3, 'hi': 6}
+            'timeout': {'lo': 14, 'hi': 22},
+            'OB': {'lo': 3, 'hi': 6},
+            'fts': {'lo': 4, 'hi': 7}
         }
         if stoppage_type in stamina_dict:
             for player in self.home_team.roster + self.away_team.roster:
@@ -89,7 +89,7 @@ class Game():
         Stamina increase for bench whenever a normal play occurs.
         """
         for player in home_bench + away_bench:
-            base_increase = generate_random_int(2, 4)
+            base_increase = generate_random_int(3, 6)
             modifier = (player.endurance.curr_rating - 50) / 50
             adjustment = int(base_increase * (modifier * 0.2))
             player.stamina = min(99, player.stamina + base_increase + adjustment)
@@ -103,11 +103,11 @@ class Game():
         for team in teams_on_court:
             for player in team:
                 if player == primary_playmaker or player == primary_defender:
-                    base_decrease = generate_random_int(5, 8)
-                elif player == secondary_playmaker or player == secondary_defender or player == primary_o_reb or player == primary_d_reb:
                     base_decrease = generate_random_int(4, 7)
+                elif player == secondary_playmaker or player == secondary_defender or player == primary_o_reb or player == primary_d_reb:
+                    base_decrease = generate_random_int(3, 6)
                 else:
-                    base_decrease = generate_random_int(2, 5)
+                    base_decrease = generate_random_int(1, 4)
 
                 modifier = (player.endurance.curr_rating - 50) / 50
                 adjustment = int(base_decrease * (modifier * -0.2))  # high endurance = smaller decrease
@@ -159,6 +159,12 @@ class Game():
         away_team.fouls_in_q = 0
         home_team.points_in_q = 0
         away_team.points_in_q = 0
+
+    def _update_minutes(self, total_plays):
+        for player in self.home_team.roster + self.away_team.roster:
+            plays = player.game_stats['plays']
+            minutes = (plays / total_plays) * 48
+            player.game_stats['minutes'] = round(minutes, 1)
 
     def _print_end_of_game_stats(self, ot_count):
         """
@@ -266,20 +272,41 @@ class Game():
         """
         def handle_subs(on_court, on_bench, starters, team_name):
             # Check to ensure there is no overlap error between on court and on bench players.
-            overlap = set(on_court) & set(on_bench)
-            if overlap:
-                print(f"⚠️ Overlap detected in {team_name}: {[p.name for p in overlap]} "
-                      f"found in both court and bench. Auto-fixing.")
-                on_bench[:] = [p for p in on_bench if p not in on_court]
+            sorted_bench = get_sorted_players(on_bench)
+            rotation_bench = sorted_bench[:4]
+            deep_bench = sorted_bench[4:]
 
             subs_to_make = []
-            available_bench = get_sorted_players(on_bench)[:]  # fresh copy
+            available_bench = get_sorted_players(rotation_bench)[:]  # fresh copy
+            deep_available = get_sorted_players(deep_bench)[:]
 
             # Plan substitutions
             for court_player in on_court:
-                if court_player.stamina < 30 or court_player not in starters.values():
+                if (court_player in starters.values() and court_player.stamina < 10) or \
+                        (court_player not in starters.values() and court_player.stamina < 40):
                     cp_position = 'guard' if court_player.position in ('PG', 'SG') else 'forward'
 
+                    # Check if a rested starter is available to come back in
+                    rested_starters = [
+                        p for p in available_bench + deep_available
+                        if p in starters.values()
+                           and p.stamina > 60
+                           and ((p.position in ('PG', 'SG') and cp_position == 'guard') or
+                                (p.position in ('SF', 'PF', 'C') and cp_position == 'forward'))
+                    ]
+                    if rested_starters:
+                        best_choice = get_sorted_players(rested_starters)[0]
+                        subs_to_make.append((court_player, best_choice))
+
+                        # Remove from available pools so no double-use
+                        if best_choice in available_bench:
+                            available_bench.remove(best_choice)
+                        else:
+                            deep_available.remove(best_choice)
+
+                        continue  # move to next court_player
+
+                    sub_found = False
                     for bench_player in available_bench:
                         if bench_player.stamina <= 75:
                             continue
@@ -288,7 +315,17 @@ class Game():
                                 (bench_player.position in ('SF', 'PF', 'C') and cp_position == 'forward'):
                             subs_to_make.append((court_player, bench_player))
                             available_bench.remove(bench_player)  # prevent reuse
+                            sub_found = True
                             break
+
+                    if not sub_found:
+                        for bench_player in deep_available:
+                            if bench_player.stamina > 75:
+                                if (bench_player.position in ('PG', 'SG') and cp_position == 'guard') or \
+                                        (bench_player.position in ('SF', 'PF', 'C') and cp_position == 'forward'):
+                                    subs_to_make.append((court_player, bench_player))
+                                    deep_available.remove(bench_player)
+                                    break
 
             # Commit substitutions
             new_court = list(on_court)
@@ -1646,6 +1683,8 @@ class Game():
             self.OT_plays_current = 0
             ot_count += 1
         print('END GAME')
+        # Update minutes for all players
+        self._update_minutes(self.total_plays)
         # Print End of game stats
         self._print_end_of_game_stats(ot_count)
         # Log player stats and game stats
