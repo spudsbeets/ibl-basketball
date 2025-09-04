@@ -6,7 +6,8 @@ class Team:
 
     def __init__(self, nickname, city, region, logo, colors,
                  coach=None, roster=None, starters=None, bench=None, scouts=None,
-                 accolades=None):
+                 accolades=None, average_stats=None, individual_stats_season=None,
+                 individual_stats_career=None, stats_archive=None):
         # General team info
         self.nickname = nickname
         self.city = city
@@ -26,13 +27,13 @@ class Team:
         self.fouls_in_q = 0
         # Stats and Accolades
         self.accolades = accolades if accolades is not None else {'2030': None}
-        self.wins = 0,
-        self.losses = 0,
+        self.wins = 0
+        self.losses = 0
         self.total_stats = make_team_totals()
-        self.average_stats = self._calculate_average_stats()
-        self.individual_stats_season = {}
-        self.individual_stats_career = {}
-        self.stats_archive = {}
+        self.average_stats = average_stats if average_stats is not None else {}
+        self.individual_stats_season = individual_stats_season if individual_stats_season is not None else {}
+        self.individual_stats_career = individual_stats_career if individual_stats_career is not None else {}
+        self.stats_archive = stats_archive if stats_archive is not None else {}
         # Year Tracker
         self.curr_year = 2030
 
@@ -59,17 +60,17 @@ class Team:
             if self.total_stats['2fg_taken'] == 0:
                 fg2_perc = 0
             else:
-                fg2_perc = round(self.total_stats['2fg_made'] / self.total_stats['2fg_taken'], 3)
+                fg2_perc = round((self.total_stats['2fg_made'] / self.total_stats['2fg_taken']) * 100, 3)
 
             if self.total_stats['3fg_taken'] == 0:
                 fg3_perc = 0
             else:
-                fg3_perc = round(self.total_stats['3fg_made'] / self.total_stats['3fg_taken'], 3)
+                fg3_perc = round((self.total_stats['3fg_made'] / self.total_stats['3fg_taken']) * 100, 3)
 
             if self.total_stats['ft_taken'] == 0:
                 ft_perc = 0
             else:
-                ft_perc = round(self.total_stats['ft_made'] / self.total_stats['ft_taken'], 3)
+                ft_perc = round((self.total_stats['ft_made'] / self.total_stats['ft_taken']) * 100, 3)
 
             return {
             'ppg': round(self.total_stats['points'] / self.total_stats['games_played'], 1),
@@ -123,27 +124,29 @@ class Team:
 
         # Update Total Stats
         self.total_stats['games_played'] += 1
-        self.total_stats['points'] += game_stat_block[team]['points']
-        self.total_stats['2fg_taken'] += game_stat_block[team]['2fg_taken']
-        self.total_stats['2fg_made'] += game_stat_block[team]['2fg_made']
-        self.total_stats['3fg_taken'] += game_stat_block[team]['3fg_taken']
-        self.total_stats['3fg_made'] += game_stat_block[team]['3fg_made']
-        self.total_stats['ft_taken'] += game_stat_block[team]['ft_taken']
-        self.total_stats['ft_made'] += game_stat_block[team]['ft_made']
-        self.total_stats['rebounds'] += game_stat_block[team]['rebounds']
-        self.total_stats['offensive_rebounds'] += game_stat_block[team]['offensive_rebounds']
-        self.total_stats['defensive_rebounds'] += game_stat_block[team]['defensive_rebounds']
-        self.total_stats['assists'] += game_stat_block[team]['assists']
-        self.total_stats['steals'] += game_stat_block[team]['steals']
-        self.total_stats['blocks'] += game_stat_block[team]['blocks']
-        self.total_stats['turnovers'] += game_stat_block[team]['turnovers']
-        self.total_stats['fouls'] += game_stat_block[team]['fouls']
+        self.total_stats['points'] += game_stat_block['Full Game'][team]['points']
+        self.total_stats['2fg_taken'] += game_stat_block['Full Game'][team]['2fg_taken']
+        self.total_stats['2fg_made'] += game_stat_block['Full Game'][team]['2fg_made']
+        self.total_stats['3fg_taken'] += game_stat_block['Full Game'][team]['3fg_taken']
+        self.total_stats['3fg_made'] += game_stat_block['Full Game'][team]['3fg_made']
+        self.total_stats['ft_taken'] += game_stat_block['Full Game'][team]['ft_taken']
+        self.total_stats['ft_made'] += game_stat_block['Full Game'][team]['ft_made']
+        self.total_stats['rebounds'] += game_stat_block['Full Game'][team]['rebounds']
+        self.total_stats['offensive_rebounds'] += game_stat_block['Full Game'][team]['offensive_rebounds']
+        self.total_stats['defensive_rebounds'] += game_stat_block['Full Game'][team]['defensive_rebounds']
+        self.total_stats['assists'] += game_stat_block['Full Game'][team]['assists']
+        self.total_stats['steals'] += game_stat_block['Full Game'][team]['steals']
+        self.total_stats['blocks'] += game_stat_block['Full Game'][team]['blocks']
+        self.total_stats['turnovers'] += game_stat_block['Full Game'][team]['turnovers']
+        self.total_stats['fouls'] += game_stat_block['Full Game'][team]['fouls']
 
         # Update Individual Stats
         for player in self.roster:
             player.update_total_stats()
 
         self.update_individual_stats
+
+        self.average_stats = self._calculate_average_stats()
 
     # Broad effect of a coach on player ratings
     def alter_offensive_player_ratings_by_coach(self):
@@ -247,7 +250,7 @@ class Team:
             'accolades': self.accolades[str(self.curr_year)]
         }
         # Clear stats, move to next season
-        self.total_stats = team_totals
+        self.total_stats = make_team_totals()
         self.individual_stats_season = {}
         for player in self.roster:
             player.next_season()

@@ -138,5 +138,6 @@ def make_team_totals():
     'assists': 0,
     'steals': 0,
     'blocks': 0,
-    'turnovers': 0
+    'turnovers': 0,
+    'fouls': 0
 }

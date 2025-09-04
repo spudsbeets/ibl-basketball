@@ -1,0 +1,3 @@
+A hyper-realistic basketball simulator for a parallel universe. The basis for an eventual video game, this program generates a pool of draftable prospects, simulates a draft that sets up two teams, assigns unique coaches, and simulates a game. Throughout logging all relevant stats and box score information, all calculated through a robust system of pseudo-randomized, modularized logic in Python. 
+
+To test, clone the repository (ensure you clone simulate-game branch), then run simulator_script.py. Tweak print statements to see precisely which information you want to see. All results will be displayed in the console. Enjoy!

@@ -9,7 +9,8 @@ class Player:
                  o_reb, finishing, post_up, open_mid, open_3, contest_mid, contest_3, playmaking, ft_shoot,
                  d_reb, block, steal, stickiness,
                  awareness, endurance, confidence,
-                 speed, strength):
+                 speed, strength,
+                 stats_archive=None):
 
         # Static Values
         self.name = name
@@ -64,10 +65,13 @@ class Player:
         self.game_stats = make_individual_stat_block_game()
         self.season_stats = make_individual_stat_block_overalls()
         self.career_stats = make_individual_stat_block_overalls()
-        self.stats_archive = {}
+        self.stats_archive = stats_archive if stats_archive is not None else {}
 
         # Initializes stamina meter to be changed mid-game
         self.stamina = 99
+
+        # Trick to avoid double subbing bug
+        self.subbed_out_this_play = False
 
         # Year Tracker
         self.curr_year = 2030
@@ -169,9 +173,9 @@ class Player:
             self.career_stats['minutes']['average'] = round(self.career_stats['minutes']['total'] / self.career_stats['games_played'], 1)
 
             self.season_stats['points']['total'] += self.game_stats['points']
-            self.career_stats['points']['total'] += self.career_stats['points']
-            self.season_stats['points']['average'] = round(self.season_stats['points'] / self.season_stats['games_played'], 1)
-            self.career_stats['points']['average'] = round(self.career_stats['points'] / self.career_stats['games_played'], 1)
+            self.career_stats['points']['total'] += self.game_stats['points']
+            self.season_stats['points']['average'] = round(self.season_stats['points']['total'] / self.season_stats['games_played'], 1)
+            self.career_stats['points']['average'] = round(self.career_stats['points']['total'] / self.career_stats['games_played'], 1)
 
             self.season_stats['2fg_taken'] += self.game_stats['2fg_taken']
             self.career_stats['2fg_taken'] += self.game_stats['2fg_taken']
@@ -186,55 +190,67 @@ class Player:
             self.season_stats['ft_made'] += self.game_stats['ft_made']
             self.career_stats['ft_made'] += self.game_stats['ft_made']
 
-            self.season_stats['2fg%'] = round(self.season_stats['2fg_taken'] / self.season_stats['2fg_made'], 3)
-            self.season_stats['3fg%'] = round(self.season_stats['3fg_taken'] / self.season_stats['3fg_made'], 3)
-            self.season_stats['ft%'] = round(self.season_stats['ft_taken'] / self.season_stats['ft_made'], 3)
-            self.career_stats['2fg%'] = round(self.career_stats['2fg_taken'] / self.career_stats['2fg_made'], 3)
-            self.career_stats['3fg%'] = round(self.career_stats['3fg_taken'] / self.career_stats['3fg_made'], 3)
-            self.career_stats['ft%'] = round(self.career_stats['ft_taken'] / self.career_stats['ft_made'], 3)
+            self.season_stats[
+                '2fg%'] = f"{round((self.season_stats['2fg_made'] / self.season_stats['2fg_taken']) * 100, 1)}%" if \
+            self.season_stats['2fg_taken'] > 0 else "0.0%"
+            self.season_stats[
+                '3fg%'] = f"{round((self.season_stats['3fg_made'] / self.season_stats['3fg_taken']) * 100, 1)}%" if \
+            self.season_stats['3fg_taken'] > 0 else "0.0%"
+            self.season_stats[
+                'ft%'] = f"{round((self.season_stats['ft_made'] / self.season_stats['ft_taken']) * 100, 1)}%" if \
+            self.season_stats['ft_taken'] > 0 else "0.0%"
+            self.career_stats[
+                '2fg%'] = f"{round((self.career_stats['2fg_made'] / self.career_stats['2fg_taken']) * 100, 1)}%" if \
+            self.career_stats['2fg_taken'] > 0 else "0.0%"
+            self.career_stats[
+                '3fg%'] = f"{round((self.career_stats['3fg_made'] / self.career_stats['3fg_taken']) * 100, 1)}%" if \
+            self.career_stats['3fg_taken'] > 0 else "0.0%"
+            self.career_stats[
+                'ft%'] = f"{round((self.career_stats['ft_made'] / self.career_stats['ft_taken']) * 100, 1)}%" if \
+            self.career_stats['ft_taken'] > 0 else "0.0%"
 
             self.season_stats['rebounds']['total'] += self.game_stats['rebounds']
-            self.career_stats['rebounds']['total'] += self.career_stats['rebounds']
-            self.season_stats['rebounds']['average'] = round(self.season_stats['rebounds'] / self.season_stats['games_played'], 1)
-            self.career_stats['rebounds']['average'] = round(self.career_stats['rebounds'] / self.career_stats['games_played'], 1)
+            self.career_stats['rebounds']['total'] += self.game_stats['rebounds']
+            self.season_stats['rebounds']['average'] = round(self.season_stats['rebounds']['total'] / self.season_stats['games_played'], 1)
+            self.career_stats['rebounds']['average'] = round(self.career_stats['rebounds']['total'] / self.career_stats['games_played'], 1)
 
             self.season_stats['offensive_rebounds']['total'] += self.game_stats['offensive_rebounds']
-            self.career_stats['offensive_rebounds']['total'] += self.career_stats['offensive_rebounds']
-            self.season_stats['offensive_rebounds']['average'] = round(self.season_stats['offensive_rebounds'] / self.season_stats['games_played'], 1)
-            self.career_stats['offensive_rebounds']['average'] = round(self.career_stats['offensive_rebounds'] / self.career_stats['games_played'], 1)
+            self.career_stats['offensive_rebounds']['total'] += self.game_stats['offensive_rebounds']
+            self.season_stats['offensive_rebounds']['average'] = round(self.season_stats['offensive_rebounds']['total'] / self.season_stats['games_played'], 1)
+            self.career_stats['offensive_rebounds']['average'] = round(self.career_stats['offensive_rebounds']['total'] / self.career_stats['games_played'], 1)
 
             self.season_stats['defensive_rebounds']['total'] += self.game_stats['defensive_rebounds']
-            self.career_stats['defensive_rebounds']['total'] += self.career_stats['defensive_rebounds']
-            self.season_stats['defensive_rebounds']['average'] = round(self.season_stats['defensive_rebounds'] / self.season_stats['games_played'], 1)
-            self.career_stats['defensive_rebounds']['average'] = round(self.career_stats['defensive_rebounds'] / self.career_stats['games_played'], 1)
+            self.career_stats['defensive_rebounds']['total'] += self.game_stats['defensive_rebounds']
+            self.season_stats['defensive_rebounds']['average'] = round(self.season_stats['defensive_rebounds']['total'] / self.season_stats['games_played'], 1)
+            self.career_stats['defensive_rebounds']['average'] = round(self.career_stats['defensive_rebounds']['total'] / self.career_stats['games_played'], 1)
 
             self.season_stats['assists']['total'] += self.game_stats['assists']
-            self.career_stats['assists']['total'] += self.career_stats['assists']
-            self.season_stats['assists']['average'] = round(self.season_stats['assists'] / self.season_stats['games_played'], 1)
-            self.career_stats['assists']['average'] = round(self.career_stats['assists'] / self.career_stats['games_played'], 1)
+            self.career_stats['assists']['total'] += self.game_stats['assists']
+            self.season_stats['assists']['average'] = round(self.season_stats['assists']['total'] / self.season_stats['games_played'], 1)
+            self.career_stats['assists']['average'] = round(self.career_stats['assists']['total'] / self.career_stats['games_played'], 1)
 
             self.season_stats['steals']['total'] += self.game_stats['steals']
-            self.career_stats['steals']['total'] += self.career_stats['steals']
-            self.season_stats['steals']['average'] = round(self.season_stats['steals'] / self.season_stats['games_played'], 1)
-            self.career_stats['steals']['average'] = round(self.career_stats['steals'] / self.career_stats['games_played'], 1)
+            self.career_stats['steals']['total'] += self.game_stats['steals']
+            self.season_stats['steals']['average'] = round(self.season_stats['steals']['total'] / self.season_stats['games_played'], 1)
+            self.career_stats['steals']['average'] = round(self.career_stats['steals']['total'] / self.career_stats['games_played'], 1)
 
             self.season_stats['blocks']['total'] += self.game_stats['blocks']
-            self.career_stats['blocks']['total'] += self.career_stats['blocks']
-            self.season_stats['blocks']['average'] = round(self.season_stats['blocks'] / self.season_stats['games_played'], 1)
-            self.career_stats['blocks']['average'] = round(self.career_stats['blocks'] / self.career_stats['games_played'], 1)
+            self.career_stats['blocks']['total'] += self.game_stats['blocks']
+            self.season_stats['blocks']['average'] = round(self.season_stats['blocks']['total'] / self.season_stats['games_played'], 1)
+            self.career_stats['blocks']['average'] = round(self.career_stats['blocks']['total'] / self.career_stats['games_played'], 1)
 
             self.season_stats['turnovers']['total'] += self.game_stats['turnovers']
-            self.career_stats['turnovers']['total'] += self.career_stats['turnovers']
-            self.season_stats['turnovers']['average'] = round(self.season_stats['turnovers'] / self.season_stats['games_played'], 1)
-            self.career_stats['turnovers']['average'] = round(self.career_stats['turnovers'] / self.career_stats['games_played'], 1)
+            self.career_stats['turnovers']['total'] += self.game_stats['turnovers']
+            self.season_stats['turnovers']['average'] = round(self.season_stats['turnovers']['total'] / self.season_stats['games_played'], 1)
+            self.career_stats['turnovers']['average'] = round(self.career_stats['turnovers']['total'] / self.career_stats['games_played'], 1)
 
             self.season_stats['fouls']['total'] += self.game_stats['fouls']
-            self.career_stats['fouls']['total'] += self.career_stats['fouls']
-            self.season_stats['fouls']['average'] = round(self.season_stats['fouls'] / self.season_stats['games_played'], 1)
-            self.career_stats['fouls']['average'] = round(self.career_stats['fouls'] / self.career_stats['games_played'], 1)
+            self.career_stats['fouls']['total'] += self.game_stats['fouls']
+            self.season_stats['fouls']['average'] = round(self.season_stats['fouls']['total'] / self.season_stats['games_played'], 1)
+            self.career_stats['fouls']['average'] = round(self.career_stats['fouls']['total'] / self.career_stats['games_played'], 1)
 
-            self.season_stats['+/-']['total'] += self.game_stats['+/-']
-            self.career_stats['+/-']['total'] += self.career_stats['+/-']
+            self.season_stats['+/-'] += self.game_stats['+/-']
+            self.career_stats['+/-'] += self.game_stats['+/-']
 
         self.game_stats = make_individual_stat_block_game()
 

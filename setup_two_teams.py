@@ -7,14 +7,18 @@ def has_position(team, position):
 
 # Finds best available player then removes them from prospect pool
 def find_and_draft_best_player_by_pos(pool, positions):
+    # Sort the pool once to find the best player
     sorted_pool = get_sorted_players(pool)
+
     for player in sorted_pool:
         if player.position in positions:
-            for i, p in enumerate(pool):
-                if p.name == player.name:
-                    del pool[i]
-                    break
+            # We found the best player, so remove them from the original pool
+            if player in pool:
+                pool.remove(player)
             return player
+
+    # If no player is found, return None
+    return None
 
 def two_team_setup(team1, team2):
     # Assign coaches to teams
